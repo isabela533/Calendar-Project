@@ -1,0 +1,229 @@
+{
+    "usuario": "Isabela",
+    "agencia": "Agencia Grateau",
+    "presupuesto": 5000,
+    "equipo_trabajo": [
+        {
+            "id": 1,
+            "nombre": "Diseñador Gráfico",
+            "rol": "diseño",
+            "cantidad": 2
+        },
+        {
+            "id": 2,
+            "nombre": "Editor de Video",
+            "rol": "edición",
+            "cantidad": 1
+        },
+        {
+            "id": 3,
+            "nombre": "Community Manager",
+            "rol": "comunicación",
+            "cantidad": 5
+        },
+        {
+            "id": 4,
+            "nombre": "Influencer",
+            "rol": "promoción",
+            "cantidad": 10
+        },
+        {
+            "id": 5,
+            "nombre": "Guionista",
+            "rol": "contenido",
+            "cantidad": 1
+        },
+        {
+            "id": 6,
+            "nombre": "Analista de Métricas",
+            "rol": "análisis",
+            "cantidad": 2
+        },
+        {
+            "id": 7,
+            "nombre": "Estratega de Marketing",
+            "rol": "estrategia",
+            "cantidad": 3
+        },
+        {
+            "id": 8,
+            "nombre": "Clientes fijos",
+            "rol": "clientela",
+            "cantidad": 11
+        }
+    ],
+    "recursos_tecnicos": [
+        {
+            "id": 101,
+            "nombre": "Cámara Profesional",
+            "tipo": "equipo",
+            "cantidad": 3
+        },
+        {
+            "id": 102,
+            "nombre": "Plataforma de Anuncios",
+            "tipo": "software",
+            "cantidad": 1
+        },
+        {
+            "id": 103,
+            "nombre": "Herramienta de Gestion",
+            "tipo": "software",
+            "cantidad": 1
+        },
+        {
+            "id": 104,
+            "nombre": "Sala de Reuniones",
+            "tipo": "infraestructura",
+            "cantidad": 3
+        },
+        {
+            "id": 105,
+            "nombre": "Acceso a Datos",
+            "tipo": "software",
+            "cantidad": 1
+        },
+        {
+            "id": 106,
+            "nombre": "Calendario de Publicaciones",
+            "tipo": "sistema",
+            "cantidad": 1
+        },
+        {
+            "id": 107,
+            "nombre": "Presentacion Visual",
+            "tipo": "preparativos",
+            "cantidad": 6
+        }
+    ],
+    "disponibilidad_recursos": {
+        "1": [
+            "2025-10-10",
+            "2025-10-12"
+        ],
+        "2": [
+            "2025-10-10",
+            "2025-10-11"
+        ],
+        "101": [
+            "2025-10-10",
+            "2025-10-13"
+        ],
+        "104": [
+            "2025-10-10",
+            "2025-10-15"
+        ]
+    },
+    "restricciones": [
+        {
+            "recurso": 101,
+            "requiere": [
+                2,
+                5
+            ]
+        },
+        {
+            "recurso": 102,
+            "requiere": [
+                1,
+                "presupuesto"
+            ]
+        },
+        {
+            "recurso": 103,
+            "requiere": [
+                6,
+                105
+            ]
+        },
+        {
+            "recurso": 8,
+            "requiere": [
+                7,
+                107
+            ]
+        },
+        {
+            "recurso": 106,
+            "requiere": [
+                3,
+                103
+            ]
+        }
+    ],
+    "eventos": [
+        {
+            "evento": "Campaña Publicitaria Multicanal",
+            "descripcion": "Lanzamiento de una campaña en Instagram, Google Ads y TikTok",
+            "recursos": [
+                1,
+                2,
+                3,
+                102,
+                4,
+                "presupuesto"
+            ],
+            "restricciones": [
+                "Si se una Plataforma de Ads debe asignarse un diseñador grafico y un presupuesto minimo",
+                "No se puede usar el mismo Community Manager en dos campañas simultaneas",
+                "No se pueden lanzar campañas competidoras en la misma plataforma al mismo tiempo"
+            ]
+        },
+        {
+            "evento": "Producción de video promocional",
+            "descripcion": "Grabación y edición de contenido audiovisual para redes sociales",
+            "recursos": [
+                101,
+                2,
+                5,
+                104,
+                4,
+                "presupuesto"
+            ],
+            "restricciones": [
+                "Si se asigna Cámara Profesional debe incluir Editor de Video y Guionista",
+                "No se puede usar la misma locación para dos grabaciones simultaneas"
+            ]
+        },
+        {
+            "evento": "Análisis de Métricas de Campaña",
+            "descripcion": "Evaluación del rendimiento de campañas activas",
+            "recursos": [
+                6,
+                "Herramienta de Analisis",
+                105
+            ],
+            "restricciones": [
+                "Si se usa Herramienta de Análisis debe incluir Analista de Métricas más Acceso a Datos",
+                "No se puede usar la misma Herramienta de Gestión si está ocupada por otro equipo"
+            ]
+        },
+        {
+            "evento": "Reunión de Estrategia con el Cliente",
+            "descripcion": "Sesión para definir objetivos, tonos de marca y presupuesto",
+            "recursos": [
+                7,
+                8,
+                107,
+                104
+            ],
+            "restricciones": [
+                "Si participa el cliente debe estar presente el Estratega de Marketing más la Presentación Visual",
+                "No se puede usar la misma Sala de Reuniones para dos reuniones simultaneas"
+            ]
+        },
+        {
+            "evento": "Gestión de Redes Sociales",
+            "descripcion": "Publicación, interacción y monitoreo en redes sociales",
+            "recursos": [
+                3,
+                103,
+                106
+            ],
+            "restricciones": [
+                "Si se publica contenido debe estar asignado el Community Manager más la Herramienta de Gestión",
+                "No se puede usar la misma Herramienta de Gestión si está ocupada por otra sesión"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+En vez de tener en mi dominio eventos, dejar que el usuario sea libre de colocar el evento que desee
+-> Esto como tal me interfiere en las reestricciones, pero, las reestricciones lo puedo poner como un elemento de 
+cada recurso segun la disponibilidad que tiene de acuerdo con la fecha 
+
+
+Idea nueva, ponerle al agregar eventos que el usuario ponga una etiqutea como que por ejemplo etiqueta venta,  y por ejemplo 
+que si me pone esa etiqueta reocmendarle los dias de black friday para colocar el evento nuevo, y obtener
+mas ventas, obviamente si no esta ocupado ese dia 
+
+Verificar si por cada vez q yo agregue un working team o algo, se me tiene que modificar el json. importante

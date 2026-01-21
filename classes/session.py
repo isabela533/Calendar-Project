@@ -4,12 +4,13 @@ from classes.working_team import Team_Manager
 from classes.restrictions import Restrictions
 
 class Session:
-    def __init__(self, correo, resources, employees, co_requisites, exclusions):
+    def __init__(self, correo, money,resources, employees, co_requisites, exclusions):
         self.correo = correo
         self.json = Gestor_json(correo)
+        self.money = money  #verificar esto
         self.rc_mg = Resources_Manager()
         self.rc_mg.add_resources(resources)  #hacer el inventario con resursos 
-        self.emp_mg = Team_Manager()
+        self.emp_mg = Team_Manager() # el inventario inicial no se guarda en el json
         self.emp_mg.add_employees(employees)  #hacer el inventario con recursos humanos
         self.restrictions = Restrictions(co_requisites, exclusions)
         

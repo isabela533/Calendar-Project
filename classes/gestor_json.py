@@ -7,7 +7,7 @@ class Gestor_json:
         try: 
             self.data = self.charge_data() 
         except Exception as e: 
-            print(f"⚠️ {e} → initializing empty data") 
+            print(f"⚠️ {e} → initializing empty data") #cuando se mande esta excepcion tengo que hacer un crear cuenta nueva
 
     def charge_data(self):
         if os.path.exists(self.ruta):

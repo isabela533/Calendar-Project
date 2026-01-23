@@ -21,37 +21,29 @@ def is_time_valid(init, end):
 
 
 # ver si esta ocupada o no esa fecha y buscar un hueco 
-def is_available(init, end, json_file):
-    #tratar de obtener los eventos q ya tiene programado el usuario
-    try:
-        with open(json_file, "r") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        return False
-
-    #en el json esta de la forma ocuped{[init,end]}
-    ocuped = data.get("ocupados", []) if isinstance(data, dict) else data
+def is_available(init, end, data :dict):
+    events = data.get("events", [])
 
     #preparar variables, en formato datetime
-    init = datetime.strptime(init, "%Y-%m-%d %H:%M")
-    end = datetime.strptime(end, "%Y-%m-%d %H:%M")
+    init_dt = datetime.strptime(init, "%Y-%m-%d %H:%M")
+    end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M")
 
     # crear una lista de los dias que estan ocupados y llenarla con las fechas de los eventos guardados
     ocuped_days = []
     solapado = False
-    for range in ocuped:
-        ev_start = datetime.strptime(range[0], "%Y-%m-%d %H:%M")
-        ev_end = datetime.strptime(range[1], "%Y-%m-%d %H:%M")
+    for ev in events:
+        ev_start = datetime.strptime(ev["init"], "%Y-%m-%d %H:%M")
+        ev_end = datetime.strptime(ev["end"], "%Y-%m-%d %H:%M")
 
         ocuped_days.append((ev_start, ev_end))  # lo agrego a la lista de fechas ocupadas
        
         # si se solapan
-        if not (end <= ev_start or init >= ev_end):
+        if not (end_dt <= ev_start or init_dt >= ev_end):
             solapado = True
 
     # si hubo solapamiento, sugerir nuevas fechas
     if solapado: 
-        suggestions = suggest_slot(init, end, ocuped_days)
+        suggestions = suggest_slot(init_dt, end_dt, ocuped_days)
         return {"available": False, "suggestions": suggestions}
     
     return {"available":True}   

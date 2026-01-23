@@ -13,10 +13,10 @@ def delete_event(session: Session, event : dict):
     
 def free_resources(session : Session, resources, employees):
     for name, _, cant, _ in resources:    
-        session.rc_mg.liberar_resource(name, cant)
+        session.rc_mg.liberar_resource(name, cant, session)
 
     for rol, cant, _ in employees:
-        session.emp_mg.liberar_employee(rol, cant)
+        session.emp_mg.liberar_employee(rol, cant, session)
 
 
 

@@ -8,16 +8,24 @@ class Resources:
         
     # para que se vea bonito en el debug 
     def __repr__(self):
-        return f"Resources(name={self.name}, cant={self.cant}, dispo={self.dispo})"
+        return f"Resources(name={self.name}, type = {self.type}, cant={self.cant}, dispo={self.dispo})"
     
 class Resources_Manager:
     def __init__(self):
         self.recursos: dict[str, Resources] = {}    #este es mi inventario de recursos 
 
-    def get_rcs(self, list_names : list[list]):
+    def show_resources(self): 
+        if not self.recursos: 
+            print("No resources in inventory.") 
+        else: 
+            print("📦 Material Resources:") 
+            for res in self.recursos.values(): 
+                print(f"- {res.name} ({res.type}) | Quantity: {res.cant} | Available: {res.dispo}")
+
+    def get_rcs(self, list_names : list[list], session: Session):
         resources = []
         for name, type, cant, dispo in list_names:
-            self.ocupar_resource(name, cant)
+            self.ocupar_resource(name, cant, session)
             resources.append(self.recursos[name].name)   #anadir instancia real a la lista
         return resources
 
@@ -82,12 +90,20 @@ class Resources_Manager:
 
     # metodo para remover del deposito
     def remove_from_inventory(self, name, cant : int):
-        if(name in self.recursos and self.recursos[name].cant >= cant):   #si ya tiene el target, disminuirle la cant
-            self.recursos[name].cant -= cant
-            if(self.recursos[name].cant <= 0):
-                del self.recursos[name] #borrar el recurso del dict 
-        else:
-            raise Exception(f"The resource {name} could not be removed from your inventory.")
-                
+        # si el recurso no existe 
+        if name not in self.recursos: 
+            raise Exception( f"Resource '{name}' does not exist in your inventory. " 
+                            f"Please check the resource name or add it first before trying to remove." ) 
+        
+        # si hay cantidad insuficiente 
+        if self.recursos[name].cant < cant: 
+            raise Exception( f"Cannot remove {cant} units of '{name}'. " 
+                            f"Only {self.recursos[name].cant} available in inventory." )
+        
+        # restar  
+        self.recursos[name].cant -= cant 
+
+        # si ya no queda ninguno, eliminar del inventario 
+        if self.recursos[name].cant == 0: del self.recursos[name]
                 
         

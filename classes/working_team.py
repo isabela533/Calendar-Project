@@ -7,17 +7,25 @@ class Work_team:
         
     #para que se vea bonito en el debug
     def __repr__(self):
-        return f"Resources(rol={self.rol}, cant={self.cant}, dispo={self.dispo})"
+        return f"WorkTeam(rol={self.rol}, cant={self.cant}, dispo={self.dispo})"
     
 class Team_Manager:
     def __init__(self):
         self.work_team : dict[str, Work_team] = {}
     
+    def show_employees(self): 
+        if not self.work_team: 
+            print("No employees in team.") 
+        else: 
+            print("👥 Human Resources:") 
+            for emp in self.work_team.values(): 
+                print(f"- Role: {emp.rol} | Quantity: {emp.cant} | Available: {emp.dispo}")
+
     #metodo para ocupar empleados
-    def get_emp(self, list_names : list[list]):
+    def get_emp(self, list_names : list[list], session: Session):
         work_team = [] 
         for rol, cant, dispo in list_names:
-            self.ocupar_employee(rol, cant)
+            self.ocupar_employee(rol, cant, session)
             work_team.append(self.work_team[rol].rol)
         return work_team
     
@@ -77,9 +85,14 @@ class Team_Manager:
 
     # metodo para remover empleado
     def remove_from_inventory(self, rol, cant : int):
-        if(rol in self.work_team and self.work_team[rol].cant >= cant):   #si ya tiene el target, disminuirle la cant
-            self.work_team[rol].cant -= cant   #quitarle la cant
-            if(self.work_team[rol].cant <= 0):
-                del self.work_team[rol] #borrar el employee del dict 
-        else:
-            raise Exception(f"The employee(s) in the {rol} role could not be removed from your team.")
+        if rol not in self.work_team: 
+            raise Exception(f"{rol} team does not exist in inventory, cannot be removed.") 
+        if self.work_team[rol].cant < cant: 
+            raise Exception(f"Cannot remove {cant} {rol} employees, only {self.work_team[rol].cant} available.") 
+        
+        # restar cantidad 
+        self.work_team[rol].cant -= cant 
+
+        # si ya no queda ninguno, elimino el rol del inventario 
+        if self.work_team[rol].cant == 0: 
+            del self.work_team[rol]

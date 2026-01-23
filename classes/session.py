@@ -47,9 +47,18 @@ class Session:
         events.append(event)
         self.refresh_data()
 
+    def show_events(self): 
+        events = self.data.get("events", []) 
+        if not events: 
+            print("No events registered.") 
+        else: 
+            print("📅 Events:") 
+            for ev in events: 
+                print(f"- {ev['name']} | {ev['init']} -> {ev['end']} | Cost: {ev['cost']}")
+
     def valid_cost(self, cost):
         data = self.data 
-        presupuesto = float(data["presupuesto"])
+        presupuesto = float(data["money"])
 
         if(cost > presupuesto):
             raise Exception("The agency's budget is not enough")
@@ -79,7 +88,7 @@ class Session:
     def sync_restrictions_to_json(self):
         self.json.data["co_requisites"] = self.restrictions.co_requisites 
         self.json.data["exclusions"] = self.restrictions.exclusions 
-        self.refresh_data(self.data)
+        self.refresh_data()
     # endregion 
 
 

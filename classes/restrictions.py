@@ -4,9 +4,27 @@ class Restrictions:
         self.co_requisites = co_requisites or {}   # {"Proyector": ["Pantalla"]}
         self.exclusions = exclusions or []       # [("Sala A", "Sala B")]
 
+    def show_restrictions(self): 
+        if not self.co_requisites and not self.exclusions: 
+            print("No restrictions defined.") 
+            
+        else: 
+            print("⚖️ Restrictions:") 
+            if self.co_requisites: 
+                print("Co-requisites:") 
+                for resource, deps in self.co_requisites.items(): 
+                    print(f"- {resource} requires {', '.join(deps)}") 
+
+            if self.exclusions: 
+                print("Exclusions:") 
+                for r1, r2 in self.exclusions: 
+                    print(f"- {r1} cannot be used with {r2}")
+
     # para que el usuario ponga sus propias restricciones 
     def add_co_requisito(self, recurso, dependencias, session : Session):
-        self.co_requisites[recurso] = self.co_requisites.get(recurso, []) + dependencias
+        current = set(self.co_requisites.get(recurso, [])) # set para evitar duplicados 
+        current.update(dependencias) 
+        self.co_requisites[recurso] = list(current)
         session.sync_restrictions_to_json()
 
     def add_exclusion(self, r1, r2, session : Session):
@@ -18,6 +36,9 @@ class Restrictions:
             self.co_requisites[recurso] = [ 
                 dep for dep in self.co_requisites[recurso] 
                 if dep not in dependencias ] #sobrescribiendo las dependencias 
+        else:
+            raise Exception(f"Restriction for '{recurso}' does not exist.")
+        
         #aqui estoy verificando si ya no quedan mas dependencias, borrar la restriccion
         if not self.co_requisites[recurso]: del self.co_requisites[recurso]
         session.sync_restrictions_to_json() #sincronizar con json
@@ -47,4 +68,4 @@ class Restrictions:
 
         if len(errors) > 0:
             # tirar un exception con todos los errores acumulados
-            raise Exception("\n".join(errors))
+            raise Exception("\n- " + "\n- ".join(errors))

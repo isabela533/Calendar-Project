@@ -4,15 +4,27 @@ from classes.working_team import Team_Manager
 from classes.restrictions import Restrictions
 
 class Session:
-    def __init__(self, correo, money,resources, employees, co_requisites, exclusions):
+    def __init__(self, correo, money, resources, employees, co_requisites, exclusions):
         self.correo = correo
         self.json = Gestor_json(correo)
-        self.money = money  #verificar esto
+        self.money = money
+
+        self.json.save_initial_data(money=self.money, 
+                                 resources=resources, 
+                                 employees=employees, 
+                                 co_requisites=co_requisites, 
+                                 exclusions=exclusions)
+        
+        #inventario en memoria y en json 
         self.rc_mg = Resources_Manager()
-        self.rc_mg.add_resources(resources)  #hacer el inventario con resursos 
-        self.emp_mg = Team_Manager() # el inventario inicial no se guarda en el json
-        self.emp_mg.add_employees(employees)  #hacer el inventario con recursos humanos
+        self.rc_mg.add_resources(resources, self) 
+        
+        self.emp_mg = Team_Manager() 
+        self.emp_mg.add_employees(employees, self)
+        
+        # restricciones
         self.restrictions = Restrictions(co_requisites, exclusions)
+ 
         
     @property 
     def data(self):
@@ -40,7 +52,26 @@ class Session:
             self.refresh_data()
             return True
         return False
+       
 
+    #region : some aditional tools
+    #sobreescribir los rcs del json
+    def sync_resources_to_json(self): 
+        self.data["resources"] = [[res.name, res.type, res.cant, res.dispo] 
+                                       for res in self.rc_mg.recursos.values()] 
+        self.refresh_data() 
+
+    #sobreescribir los emp del json
+    def sync_employees_to_json(self): 
+        self.data["employees"] = [[emp.rol, emp.cant, emp.dispo] 
+                                       for emp in self.emp_mg.work_team.values()] 
+        self.refresh_data() 
+
+    def sync_restrictions_to_json(self):
+        self.json.data["co_requisites"] = self.restrictions.co_requisites 
+        self.json.data["exclusions"] = self.restrictions.exclusions 
+        self.refresh_data(self.data)
+    # endregion 
 
 
 

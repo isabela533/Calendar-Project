@@ -7,7 +7,7 @@ class Gestor_json:
         try: 
             self.data = self.charge_data() 
         except Exception as e: 
-            print(f"⚠️ {e} → initializing empty data") #cuando se mande esta excepcion tengo que hacer un crear cuenta nueva
+            print(f"⚠️ {e} → initializing empty data")
 
     def charge_data(self):
         if os.path.exists(self.ruta):
@@ -16,16 +16,30 @@ class Gestor_json:
                 return self.data
         else:
             raise Exception("Account not found")
+        
+    def save_initial_data (self, money: int, resources: list[list], employees: list[list], co_requisites: dict, exclusions: list[tuple]): 
+        data = {
+                "money": money, 
+                "resources": resources,
+                "employees": employees, 
+                "co_requisites": co_requisites, 
+                "exclusions": exclusions, 
+                "events": [] 
+            } 
+        self.save_data(data) 
+        return data
 
-    #el data es un diccionario 
-    def save_data(self, data: dict):
+
+    def save_data(self, data):
         with open(self.ruta, "w", encoding="utf-8") as archivo:
             json.dump(data, archivo, indent=4, ensure_ascii=False)
+        self.data = data
         print("Your data is saved")
         return self.data
     
+    #arreglar esto 
     def add_to_json(self, key, value : dict):  
-        data : dict = self.charge_data()  
+        data = self.data 
         
         if key not in data:
             raise Exception("An invalid key was sent") 

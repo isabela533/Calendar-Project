@@ -1,3 +1,4 @@
+from classes.session import Session
 class Work_team:
     def __init__(self, rol : str, cant : int = 1, dispo : bool = True):
         self.rol = rol
@@ -12,7 +13,7 @@ class Team_Manager:
     def __init__(self):
         self.work_team : dict[str, Work_team] = {}
     
-    #metodo para ocupar empleados, y pasarlos obtener objetos tipo work team 
+    #metodo para ocupar empleados
     def get_emp(self, list_names : list[list]):
         work_team = [] 
         for rol, cant, dispo in list_names:
@@ -20,7 +21,7 @@ class Team_Manager:
             work_team.append(self.work_team[rol].rol)
         return work_team
     
-    def liberar_employee(self, rol, cant):
+    def liberar_employee(self, rol, cant, session : Session):
         # el empleado existe y está disponible 
         if self.is_available(rol): 
             self.work_team[rol].cant += cant # dispo ya es True, se mantiene así 
@@ -33,8 +34,9 @@ class Team_Manager:
         #el empleado no existe en el inventario, lanzar error 
         else: 
             raise Exception(f"{rol} team does not exist in inventory, cannot be released.")
+        session.sync_employees_to_json()
  
-    def ocupar_employee(self, rol, cant):
+    def ocupar_employee(self, rol, cant, session : Session):
         # verificar si esta disponible el trabajador  
         if not self.is_available(rol): 
             raise Exception(f"Your {rol} team is unavailable and cannot assist at this event. " 
@@ -51,17 +53,20 @@ class Team_Manager:
         # si ya no queda, marcar como no diponible  
         if self.work_team[rol].cant == 0: 
             self.work_team[rol].dispo = False
+        session.sync_employees_to_json()
 
     def is_available(self, rol) -> bool:
         return rol in self.work_team and self.work_team[rol].dispo and self.work_team[rol].cant > 0
 
-    def add_employees(self, employees : list[list]):
+    def add_employees(self, employees : list[list], session : Session):
         for rol, cant, dispo in employees:
             self.add_to_inventory(rol, cant, dispo)
+        session.sync_employees_to_json()
     
-    def delete_employees(self, employees : list[list]): 
+    def delete_employees(self, employees : list[list], session : Session): 
         for rol, cant, dispo in employees:
             self.remove_from_inventory(rol, cant)
+        session.sync_employees_to_json()
 
     # metodo para agregar empleado
     def add_to_inventory(self, rol, cant = 1, dispo = True):

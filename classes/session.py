@@ -4,17 +4,26 @@ from classes.working_team import Team_Manager
 from classes.restrictions import Restrictions
 
 class Session:
-    def __init__(self, correo, money, resources, employees, co_requisites, exclusions):
+    def __init__(self, correo, money = None, resources = None, employees = None, co_requisites = None, exclusions = None, create = False):
         self.correo = correo
         self.json = Gestor_json(correo)
-        self.money = money
-
-        self.json.save_initial_data(money=self.money, 
-                                 resources=resources, 
-                                 employees=employees, 
-                                 co_requisites=co_requisites, 
-                                 exclusions=exclusions)
         
+        if create: # crear cuenta nueva 
+            self.money = money or 0 
+            resources = resources or [] 
+            employees = employees or [] 
+            co_requisites = co_requisites or {} 
+            exclusions = exclusions or [] 
+            self.json.save_initial_data(self.money, resources, employees, co_requisites, exclusions)
+
+        else: # abrir sesión existente 
+            data = self.json.charge_data() 
+            self.money = data["money"] 
+            resources = data["resources"] 
+            employees = data["employees"] 
+            co_requisites = data["co_requisites"] 
+            exclusions = data["exclusions"]
+
         #inventario en memoria y en json 
         self.rc_mg = Resources_Manager()
         self.rc_mg.add_resources(resources, self) 

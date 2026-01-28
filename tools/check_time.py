@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 import json 
 
-#TODO: Revisar
-
 #   ver validez de fechas (formato y validez)
 def is_time_valid(init, end):
     #   formato

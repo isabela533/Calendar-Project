@@ -2,7 +2,8 @@ from classes.gestor_json import Gestor_json
 from classes.resources import Resources_Manager
 from classes.working_team import Team_Manager
 from classes.restrictions import Restrictions
-
+from gestor.add_event import add_event as gestor_add_event
+from gestor.delete_event import delete_event as gestor_del_event
 class Session:
     def __init__(self, correo, money = None, resources = None, employees = None, co_requisites = None, exclusions = None, create = False):
         self.correo = correo
@@ -26,10 +27,10 @@ class Session:
 
         #inventario en memoria y en json 
         self.rc_mg = Resources_Manager()
-        self.rc_mg.add_resources(resources, self) 
+        self.add_resources(resources) 
         
         self.emp_mg = Team_Manager() 
-        self.emp_mg.add_employees(employees, self)
+        self.add_employee(employees)
         
         # restricciones
         self.restrictions = Restrictions(co_requisites, exclusions)
@@ -42,7 +43,9 @@ class Session:
     def refresh_data(self):
         self.json.save_data(self.data)
 
-    def add_event(self, event):
+    # region -> Manejo de eventos
+    def add_event(self, event : dict):
+        gestor_add_event(event, self)
         events : list[dict] = self.data["events"]
         events.append(event)
         self.refresh_data()
@@ -63,16 +66,80 @@ class Session:
         if(cost > presupuesto):
             raise Exception("The agency's budget is not enough")
     
-    def delete_event(self, event):
+    def delete_event(self, event : dict):
+        gestor_del_event(self, event)
         events: list[dict] = self.data["events"]
         if event in events: 
             events.remove(event)
             self.refresh_data()
             return True
         return False
+    # endregion
        
+    # region -> Manejo de recursos
+    def add_resources(self, rc : list[list]):
+        self.rc_mg.add_resources(rc)
+        self.sync_resources_to_json()
 
-    #region : some aditional tools
+    def remove_resources(self, rc : list[list]):
+        self.rc_mg.remove_resources(rc)
+        self.sync_resources_to_json()
+
+    def ocupar_resource(self, name, cant):
+        self.rc_mg.ocupar_resource(name, cant)
+        self.sync_resources_to_json()
+
+    def liberar_resource(self, name, cant):
+        self.rc_mg.liberar_resource(name, cant)
+        self.sync_resources_to_json()
+
+    def show_rc(self):
+        self.rc_mg.show_resources()
+    #endregion
+
+    # region -> Manejo de empleados
+    def add_employee(self, emp : list[list]):
+        self.emp_mg.add_employees(emp)
+        self.sync_employees_to_json()
+
+    def remove_employee(self, emp : list[list]):
+        self.emp_mg.delete_employees(emp)
+        self.sync_employees_to_json()
+
+    def ocupar_employee(self, rol, cant):
+        self.emp_mg.ocupar_employee(rol, cant)
+        self.sync_employees_to_json()
+    
+    def liberar_employee(self, rol, cant):
+        self.emp_mg.liberar_employee(rol, cant)
+        self.sync_employees_to_json()
+
+    def show_employees(self):
+        self.emp_mg.show_employees()
+    #endregion
+
+    #region -> Manejo de restricciones
+    def add_exclusion(self, r1, r2):
+        self.restrictions.add_exclusion(r1, r2)
+        self.sync_restrictions_to_json()
+
+    def add_co_rq(self, recurso : str, dependencias : list[str]):
+        self.restrictions.add_co_requisito(recurso, dependencias)
+        self.sync_restrictions_to_json()
+
+    def remove_exclusion(self, r1 : str, r2: str):
+        self.restrictions.delete_exclusion(r1, r2)
+        self.sync_restrictions_to_json()
+
+    def remove_co_rq(self, rc : str, dep: str):
+        self.restrictions.delete_co_requisito(rc, dep)
+        self.sync_restrictions_to_json()
+
+    def show_restrictions(self):
+        self.restrictions.show_restrictions()
+    #endregion 
+    
+    #region -> some aditional tools (sync to json)
     #sobreescribir los rcs del json
     def sync_resources_to_json(self): 
         self.data["resources"] = [[res.name, res.type, res.cant, res.dispo] 

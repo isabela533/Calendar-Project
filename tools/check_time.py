@@ -17,7 +17,31 @@ def is_time_valid(init, end):
     
     return True     #  si todo esta bien, retornar true
 
+def suggest_slot(init, end, ocuped_days: list):
+    ocuped_days.sort(key=lambda x: x[0])    #se organiza por fecha de inicio
 
+    duration = end - init   #duracion del evento 
+
+    # recorriendo intervalos 
+    suggestions = []
+    for i in range(len(ocuped_days) - 1):
+        current_end = ocuped_days[i][1]     #dia que termina un evento
+        next_start = ocuped_days[i + 1][0]  #dia que empieza el otro evento
+
+        # si hay hueco, sugerir las fechas entre ambos eventos
+        if (next_start - current_end) >= duration:
+            suggested_start : datetime = current_end
+            suggested_end : datetime = suggested_start + duration
+            suggestions.append((suggested_start.strftime("%Y-%m-%d %H:%M"), suggested_end.strftime("%Y-%m-%d %H:%M")))
+            
+
+    # si no hay huecos entre eventos, sugerir el ultimo
+    last_end : datetime = ocuped_days[-1][1]
+    finish_end : datetime= last_end + duration
+    suggestions.append((last_end.strftime("%Y-%m-%d %H:%M"), finish_end.strftime("%Y-%m-%d %H:%M")))
+
+    return suggestions
+    
 # ver si esta ocupada o no esa fecha y buscar un hueco 
 def is_available(init, end, data :dict):
     events = data.get("events", [])
@@ -46,31 +70,6 @@ def is_available(init, end, data :dict):
     
     return {"available":True}   
  
-    
-def suggest_slot(init, end, ocuped_days: list):
-    ocuped_days.sort(key=lambda x: x[0])    #se organiza por fecha de inicio
-
-    duration = end - init   #duracion del evento 
-
-    # recorriendo intervalos 
-    suggestions = []
-    for i in range(len(ocuped_days) - 1):
-        current_end = ocuped_days[i][1]     #dia que termina un evento
-        next_start = ocuped_days[i + 1][0]  #dia que empieza el otro evento
-
-        # si hay hueco, sugerir las fechas entre ambos eventos
-        if (next_start - current_end) >= duration:
-            suggested_start : datetime = current_end
-            suggested_end : datetime = suggested_start + duration
-            suggestions.append((suggested_start.strftime("%Y-%m-%d %H:%M"), suggested_end.strftime("%Y-%m-%d %H:%M")))
-            
-
-    # si no hay huecos entre eventos, sugerir el ultimo
-    last_end : datetime = ocuped_days[-1][1]
-    finish_end : datetime= last_end + duration
-    suggestions.append((last_end.strftime("%Y-%m-%d %H:%M"), finish_end.strftime("%Y-%m-%d %H:%M")))
-
-    return suggestions
     
 
 

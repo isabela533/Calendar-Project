@@ -1,13 +1,17 @@
-#region Imports
-import json
-import datetime  
 from tools.check_time import is_time_valid, is_available
-from classes.session import Session
-#endregion
+from typing import TYPE_CHECKING 
+if TYPE_CHECKING: from classes.session import Session
+
+def show_options(suggestions : list[tuple]):
+    for i, (sug_init, sug_end) in enumerate(suggestions, start=1):
+            print(f"{i}. {sug_init} -> {sug_end}")
+            
+    choice = int(input("Please choose an option: "))    #dar a escoger 
+    chosen_slot = suggestions[choice - 1]
+    return chosen_slot
 
 # los eventos en el json tienen la forma de lista de diccionarios en donde cada evento es un diccionario
-
-def add_event(new_event: dict, session : Session):
+def add_event(new_event: dict, session : "Session"):
     #validar presupuesto
     session.valid_cost(new_event["money"])    
 
@@ -37,16 +41,8 @@ def add_event(new_event: dict, session : Session):
     # verificar si hay alguna restriccion que se cumpla 
     # validar la union de las dos listas -> nombres y roles de recursos materiales y humanos
     session.restrictions.validate(rsc + emp)
-    return session.add_event(new_event)
         
 
-def show_options(suggestions : list[tuple]):
-    for i, (sug_init, sug_end) in enumerate(suggestions, start=1):
-            print(f"{i}. {sug_init} -> {sug_end}")
-            
-    choice = int(input("Please choose an option: "))    #dar a escoger 
-    chosen_slot = suggestions[choice - 1]
-    return chosen_slot
 
 
 

@@ -1,9 +1,8 @@
-from classes.session import Session
 class Restrictions:
     def __init__(self, co_requisites=None, exclusions=None):
         self.co_requisites = co_requisites or {}   # {"Proyector": ["Pantalla"]}
         self.exclusions = exclusions or []       # [("Sala A", "Sala B")]
-
+    
     def show_restrictions(self): 
         if not self.co_requisites and not self.exclusions: 
             print("No restrictions defined.") 
@@ -21,17 +20,15 @@ class Restrictions:
                     print(f"- {r1} cannot be used with {r2}")
 
     # para que el usuario ponga sus propias restricciones 
-    def add_co_requisito(self, recurso, dependencias, session : Session):
+    def add_co_requisito(self, recurso, dependencias ):
         current = set(self.co_requisites.get(recurso, [])) # set para evitar duplicados 
         current.update(dependencias) 
         self.co_requisites[recurso] = list(current)
-        session.sync_restrictions_to_json()
 
-    def add_exclusion(self, r1, r2, session : Session):
-        self.exclusions.append((r1, r2))
-        session.sync_restrictions_to_json()
+    def add_exclusion(self, r1, r2 ):
+        self.exclusions.append((r1, r2))       
 
-    def delete_co_requisito(self, recurso, dependencias, session: Session):
+    def delete_co_requisito(self, recurso, dependencias ):
         if recurso in self.co_requisites:
             self.co_requisites[recurso] = [ 
                 dep for dep in self.co_requisites[recurso] 
@@ -41,15 +38,13 @@ class Restrictions:
         
         #aqui estoy verificando si ya no quedan mas dependencias, borrar la restriccion
         if not self.co_requisites[recurso]: del self.co_requisites[recurso]
-        session.sync_restrictions_to_json() #sincronizar con json
-
-    def delete_exclusion(self, r1, r2, session: Session):
+        
+    def delete_exclusion(self, r1, r2 ):
         if (r1, r2) in self.exclusions: 
             self.exclusions.remove((r1, r2))
         elif (r2, r1) in self.exclusions:
             self.exclusions.remove((r2, r1))    #por si esta en orden inverso
-        session.sync_restrictions_to_json()
-
+        
     # validar las restricciones de default 
     def validate(self, event_resources: list[str]):
         errors = []

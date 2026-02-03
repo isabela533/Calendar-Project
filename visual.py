@@ -1,10 +1,19 @@
 import streamlit as st
 import os
 from classes.session import Session
-
+import logic_buttons
 import streamlit as st
 
+st.write("DEBUG session_state:", st.session_state)
+if "flash_message" in st.session_state: 
+    st.info(st.session_state.flash_message) 
+    
 st.set_page_config(page_title="AgencePro", page_icon="📅", layout="wide")
+
+# ---------- Estado de navegación ---------- 
+if "page" not in st.session_state: 
+    st.session_state.page = "login" # página inicial 
+
 
 # ---------- CSS ----------
 st.markdown("""
@@ -19,27 +28,18 @@ body {
     padding-bottom: 0rem;
 }
 
-/* Tarjeta de login */
-.login-card {
-    background-color: #fff;
-    padding: 10rem;
-    border-radius: 25px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-    text-align: center;
-    width: 100%;
-}
-
 /* Títulos */
 .login-card h1 {
     color: #3d1f1f;
     font-size: 32px;
     margin-bottom: 0.5rem;
 }
+
 .login-card p {
-    color: #5c3c3c;
-    font-size: 18px;
-    margin-bottom: 2rem;
-}
+     color: #5c3c3c;
+     font-size: 18px;
+     margin-bottom: 2rem;
+ }
 
 /* Campo de texto */
 div.stTextInput > div > input {
@@ -61,26 +61,7 @@ div.stButton > button:first-child {
     cursor: pointer;
     margin-bottom: 1rem;
 }
-
-/* Botón Google */
-div.stButton > button:nth-child(2) {
-    background-color: white;
-    color: #4285F4;
-    border: 2px solid #4285F4;
-    padding: 0.8rem 2rem;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 1rem;
-}
-
-/* Sign up */
-.signup {
-    color: #f76c4e;
-    font-weight: bold;
-    text-decoration: none;
-}
-
+                
 /* Social icons */
 .social-icons {
     margin-top: 2rem;
@@ -95,24 +76,63 @@ div.stButton > button:nth-child(2) {
 col1, col2 = st.columns([2,3])
 
 with col1:
+    st.write("")
+    st.write("")
+    st.write("")
+   
     st.image("assets/fondo.jpg", use_container_width=True)
 
 with col2:
-    st.markdown("<div class='login-card'>", unsafe_allow_html=True)
-    st.markdown("<h1>Hi! Welcome to <b>AgencePro</b></h1>", unsafe_allow_html=True)
-    st.markdown("<p>Manage your marketing agency, simply and elegantly.</p>", unsafe_allow_html=True)
+    st.markdown("<div class='centered-col'>", unsafe_allow_html=True)
+    st.write("") # espacio vacío 
+    
+    if st.session_state.page == "login":
+        st.markdown("<h1>Hi! Welcome to <b>AgencePro</b></h1>", unsafe_allow_html=True)
+        st.markdown("<p>Manage your marketing agency, simply and elegantly.</p>", unsafe_allow_html=True)
 
-    # Campo de correo
-    correo = st.text_input("Enter your email")
+        # Campo de correo
+        correo = st.text_input("Enter your email", key = "email")
+        # Botones
+        
+        # open new pages _ logic buttons 
+        if st.button("Login"): 
+            session, msg = logic_buttons.handle_login(correo) 
+            st.info(msg) 
+            if session: 
+                st.session_state.session = session 
+                st.session_state.next_page = "dashboard" 
+            else: # si no existe cuenta, pasamos a signup 
+                st.session_state.next_page = "signup"  
+                
+        
+        # Sign up
+        st.markdown("Don’t have an account?", unsafe_allow_html=True)
+        
+        if st.button("Sign Up"): 
+            st.session_state.page = "signup"
+            
+    elif st.session_state.page == "signup":            
+            st.markdown("<h2>Create Account</h2>", unsafe_allow_html=True)
+            
+            correo = st.text_input("Enter your email", key="signup_email")
+            money = st.number_input("💰 Initial budget", min_value=0.0, step=100.0, key="signup_budget")
+            
+            if st.button("Create account"): 
+                session, msg = logic_buttons.handle_signup(correo, money) 
+                st.info(msg) 
+                if session: 
+                    st.session_state.session = session 
+                    st.session_state.next_page = "dashboard"
 
-    # Botones
-    st.button("Login")
-    st.button("Login with Google")
-
-    # Sign up
-    st.markdown("Don’t have an account? <a href='#' class='signup'>Sign up</a>", unsafe_allow_html=True)
-
-    # Social icons
-    st.markdown("<div class='social-icons'>🔗 Facebook | 🐦 Twitter | 💻 GitHub | 📸 Instagram</div>", unsafe_allow_html=True)
+    elif st.session_state.page == "dashboard":            
+            st.title("DashBoard")
+            if "session" in st.session_state: 
+                st.write(f"Active session: {st.session_state.session.email}")
+        
+    # ---------- Continue ---------- 
+    if "next_page" in st.session_state: 
+        if st.button("Continue"): 
+            st.session_state.page = st.session_state.next_page 
+            del st.session_state["next_page"]
 
     st.markdown("</div>", unsafe_allow_html=True)

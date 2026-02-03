@@ -3,10 +3,6 @@ import os
 from classes.session import Session
 import logic_buttons
 import streamlit as st
-
-st.write("DEBUG session_state:", st.session_state)
-if "flash_message" in st.session_state: 
-    st.info(st.session_state.flash_message) 
     
 st.set_page_config(page_title="AgencePro", page_icon="📅", layout="wide")
 
@@ -16,6 +12,7 @@ if "page" not in st.session_state:
 
 
 # ---------- CSS ----------
+st.set_page_config(layout="wide")
 st.markdown("""
 <style>
 body {
@@ -73,7 +70,7 @@ div.stButton > button:first-child {
 """, unsafe_allow_html=True)
 
 # ---------- Layout con columnas ----------
-col1, col2 = st.columns([2,3])
+col1, col2 = st.columns([3,4])
 
 with col1:
     st.write("")
@@ -83,6 +80,13 @@ with col1:
     st.image("assets/fondo.jpg", use_container_width=True)
 
 with col2:
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
     st.markdown("<div class='centered-col'>", unsafe_allow_html=True)
     st.write("") # espacio vacío 
     
@@ -108,8 +112,16 @@ with col2:
         # Sign up
         st.markdown("Don’t have an account?", unsafe_allow_html=True)
         
-        if st.button("Sign Up"): 
-            st.session_state.page = "signup"
+        # fila con Sign Up y Continue juntos 
+        col1, col2 = st.columns([2,2]) 
+        with col1: 
+            if st.button("Sign Up"): 
+                st.session_state.page = "signup" 
+        with col2: 
+            if "next_page" in st.session_state: 
+                if st.button("Continue", key = "login_button"): 
+                    st.session_state.page = st.session_state.next_page 
+                    del st.session_state["next_page"]
             
     elif st.session_state.page == "signup":            
             st.markdown("<h2>Create Account</h2>", unsafe_allow_html=True)
@@ -124,15 +136,15 @@ with col2:
                     st.session_state.session = session 
                     st.session_state.next_page = "dashboard"
 
+            if "next_page" in st.session_state: 
+                if st.button("Continue", key = "signupbutton"): 
+                    st.session_state.page = st.session_state.next_page 
+                    del st.session_state["next_page"]
+
     elif st.session_state.page == "dashboard":            
             st.title("DashBoard")
             if "session" in st.session_state: 
-                st.write(f"Active session: {st.session_state.session.email}")
-        
-    # ---------- Continue ---------- 
-    if "next_page" in st.session_state: 
-        if st.button("Continue"): 
-            st.session_state.page = st.session_state.next_page 
-            del st.session_state["next_page"]
+                st.write(f"Active session: {st.session_state.session.correo}")
+    
 
     st.markdown("</div>", unsafe_allow_html=True)

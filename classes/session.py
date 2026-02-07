@@ -45,10 +45,18 @@ class Session:
 
     # region -> Manejo de eventos
     def add_event(self, event : dict):
-        gestor_add_event(event, self)
-        events : list[dict] = self.data["events"]
-        events.append(event)
-        self.refresh_data()
+        result = gestor_add_event(event, self)
+        money = self.data["money"]
+        if result["success"]:
+            money -= event["cost"]
+            events : list[dict] = self.data["events"]
+            events.append(event)
+            self.refresh_data()
+            return True
+        elif "suggestions" in result:
+            return False, result["suggestions"]   
+        elif "error" in result: 
+            raise Exception(result["error"]) 
 
     def show_events(self): 
         events = self.data.get("events", []) 
@@ -69,11 +77,15 @@ class Session:
     def delete_event(self, event : dict):
         gestor_del_event(self, event)
         events: list[dict] = self.data["events"]
+        money = self.data["money"]
         if event in events: 
+            money += event["cost"]
             events.remove(event)
             self.refresh_data()
             return True
-        return False
+        else:
+            raise Exception("Event not found")  #lanza excepcion si el evento no fue encontrado
+    
     # endregion
        
     # region -> Manejo de recursos
@@ -145,7 +157,6 @@ class Session:
         self.data["resources"] = [[res.name, res.type, res.cant, res.dispo] 
                                        for res in self.rc_mg.recursos.values()] 
         self.refresh_data() 
-
     #sobreescribir los emp del json
     def sync_employees_to_json(self): 
         self.data["employees"] = [[emp.rol, emp.cant, emp.dispo] 

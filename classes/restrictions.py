@@ -44,6 +44,8 @@ class Restrictions:
             self.exclusions.remove((r1, r2))
         elif (r2, r1) in self.exclusions:
             self.exclusions.remove((r2, r1))    #por si esta en orden inverso
+        else:
+            raise Exception("This exclusion does not exist")
         
     # validar las restricciones de default 
     def validate(self, event_resources: list[str]):

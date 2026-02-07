@@ -13,7 +13,7 @@ def is_time_valid(init, end):
     # validez : verificar cuando las fechas coincidan en el mismo dia 
     now = datetime.now()
     if(init > end or init < now or end < now):
-        return "❌ Invalid dates. Please use a valid date"
+        raise Exception("❌ Invalid dates. Please use a valid date")
     
     return True     #  si todo esta bien, retornar true
 

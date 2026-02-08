@@ -45,12 +45,12 @@ class Session:
 
     # region -> Manejo de eventos
     def add_event(self, event : dict):
+        if event in self.data["events"]:
+            raise Exception(" Ummm 🤔 This event is already registered in the system.")
         result = gestor_add_event(event, self)
-        money = self.data["money"]
         if result["success"]:
-            money -= event["cost"]
-            events : list[dict] = self.data["events"]
-            events.append(event)
+            self.data["money"] -= event["cost"]
+            self.data["events"].append(event)
             self.refresh_data()
             return True
         elif "suggestions" in result:
@@ -77,9 +77,8 @@ class Session:
     def delete_event(self, event : dict):
         gestor_del_event(self, event)
         events: list[dict] = self.data["events"]
-        money = self.data["money"]
         if event in events: 
-            money += event["cost"]
+            self.data["money"] += event["cost"]
             events.remove(event)
             self.refresh_data()
             return True
@@ -93,6 +92,11 @@ class Session:
         self.rc_mg.add_resources(rc)
         self.sync_resources_to_json()
 
+    def get_rcs(self, rcs : list[list]):
+        rc = self.rc_mg.get_rcs(rcs)
+        self.sync_resources_to_json()
+        return rc
+        
     def remove_resources(self, rc : list[list]):
         self.rc_mg.remove_resources(rc)
         self.sync_resources_to_json()
@@ -113,6 +117,11 @@ class Session:
     def add_employee(self, emp : list[list]):
         self.emp_mg.add_employees(emp)
         self.sync_employees_to_json()
+
+    def get_emp(self, emp : list[list]):
+        em = self.emp_mg.get_emp(emp)
+        self.sync_employees_to_json()
+        return em
 
     def remove_employee(self, emp : list[list]):
         self.emp_mg.delete_employees(emp)

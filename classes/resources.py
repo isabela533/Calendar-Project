@@ -45,6 +45,9 @@ class Resources_Manager:
            
     #ocupar recurso del inventario 
     def ocupar_resource(self, name, cant):
+        if not name in self.recursos:
+            raise Exception(f"Not resource called {name} found")
+        
         # verificar si esta disponible 
         if not self.is_available(name): 
             raise Exception(f"Resource {name} is not available."

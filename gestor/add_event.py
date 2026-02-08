@@ -5,7 +5,7 @@ if TYPE_CHECKING: from classes.session import Session
 # los eventos en el json tienen la forma de lista de diccionarios en donde cada evento es un diccionario
 def add_event(new_event: dict, session : "Session"):
     try:
-        session.valid_cost(new_event["money"])
+        session.valid_cost(new_event["cost"])
     except Exception as e:
         return {"success": False, "error": str(e)}
 
@@ -19,8 +19,8 @@ def add_event(new_event: dict, session : "Session"):
         return {"success": False, "suggestions": result["suggestions"]}
 
     # validar recursos y empleados
-    rsc = session.rc_mg.get_rcs(new_event["resources"], session)
-    emp = session.emp_mg.get_emp(new_event["team"], session)
+    rsc = session.get_rcs(new_event["resources"])
+    emp = session.get_emp(new_event["team"])
     session.restrictions.validate(rsc + emp)
 
     # si todo está bien, agregar

@@ -4,14 +4,14 @@ if TYPE_CHECKING:
 
 def free_resources(session : "Session", resources, employees):
     for name, _, cant, _ in resources:    
-        session.rc_mg.liberar_resource(name, cant, session)
+        session.liberar_resource(name, cant)
 
     for rol, cant, _ in employees:
-        session.emp_mg.liberar_employee(rol, cant, session)
+        session.liberar_employee(rol, cant)
 
 def delete_event(session: "Session", event : dict):
     #liberar los recursos que estaban ocupados por este evento
-    free_resources(session, event["resources"], event["employees"])
+    free_resources(session, event["resources"], event["team"])
     
 
 

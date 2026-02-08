@@ -5,62 +5,66 @@ import json
 def is_time_valid(init, end):
     #   formato
     try:
-        init = datetime.strptime(init, "%Y-%m-%d %H:%M")
-        end = datetime.strptime(end, "%Y-%m-%d %H:%M")
+        init = datetime.strptime(init, "%Y-%m-%d").date()
+        end = datetime.strptime(end, "%Y-%m-%d").date()
     except ValueError:
-        return "❌ Invalid format. Use YYYY-MM-DD HH:MM"
+        return "❌ Invalid format. Use YYYY-MM-DD"
     
     # validez : verificar cuando las fechas coincidan en el mismo dia 
-    now = datetime.now()
+    now = datetime.now().date()
     if(init > end or init < now or end < now):
         raise Exception("❌ Invalid dates. Please use a valid date")
     
     return True     #  si todo esta bien, retornar true
 
 def suggest_slot(init, end, ocuped_days: list):
-    ocuped_days.sort(key=lambda x: x[0])    #se organiza por fecha de inicio
+    ocuped_days.sort(key=lambda x: x[0])  # ordenar por inicio
 
-    duration = end - init   #duracion del evento 
-
-    # recorriendo intervalos 
+    duration = end - init
     suggestions = []
+
     for i in range(len(ocuped_days) - 1):
-        current_end = ocuped_days[i][1]     #dia que termina un evento
-        next_start = ocuped_days[i + 1][0]  #dia que empieza el otro evento
+        current_end = ocuped_days[i][1]
+        next_start = ocuped_days[i + 1][0]
 
-        # si hay hueco, sugerir las fechas entre ambos eventos
-        if (next_start - current_end) >= duration:
-            suggested_start : datetime = current_end
-            suggested_end : datetime = suggested_start + duration
-            suggestions.append((suggested_start.strftime("%Y-%m-%d %H:%M"), suggested_end.strftime("%Y-%m-%d %H:%M")))
-            
+        gap = (next_start - current_end).days - 1
+        if gap >= duration.days:
+            suggested_start = current_end + timedelta(days=1)
+            suggested_end = suggested_start + duration
+            suggestion = (suggested_start.strftime("%Y-%m-%d"), suggested_end.strftime("%Y-%m-%d"))
+            if suggestion not in suggestions:
+                suggestions.append(suggestion)
 
-    # si no hay huecos entre eventos, sugerir el ultimo
-    last_end : datetime = ocuped_days[-1][1]
-    finish_end : datetime= last_end + duration
-    suggestions.append((last_end.strftime("%Y-%m-%d %H:%M"), finish_end.strftime("%Y-%m-%d %H:%M")))
+    # sugerir después del último evento
+    last_end = ocuped_days[-1][1]
+    finish_start = last_end + timedelta(days=1)
+    finish_end = finish_start + duration
+    suggestion = (finish_start.strftime("%Y-%m-%d"), finish_end.strftime("%Y-%m-%d"))
+    if suggestion not in suggestions:
+        suggestions.append(suggestion)
 
     return suggestions
+
     
 # ver si esta ocupada o no esa fecha y buscar un hueco 
 def is_available(init, end, data :dict):
     events = data.get("events", [])
 
     #preparar variables, en formato datetime
-    init_dt = datetime.strptime(init, "%Y-%m-%d %H:%M")
-    end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M")
+    init_dt = datetime.strptime(init, "%Y-%m-%d").date()
+    end_dt = datetime.strptime(end, "%Y-%m-%d").date()
 
     # crear una lista de los dias que estan ocupados y llenarla con las fechas de los eventos guardados
     ocuped_days = []
     solapado = False
     for ev in events:
-        ev_start = datetime.strptime(ev["init"], "%Y-%m-%d %H:%M")
-        ev_end = datetime.strptime(ev["end"], "%Y-%m-%d %H:%M")
+        ev_start = datetime.strptime(ev["init"], "%Y-%m-%d").date()
+        ev_end = datetime.strptime(ev["end"], "%Y-%m-%d").date()
 
         ocuped_days.append((ev_start, ev_end))  # lo agrego a la lista de fechas ocupadas
        
         # si se solapan
-        if not (end_dt <= ev_start or init_dt >= ev_end):
+        if init_dt <= ev_end and end_dt >= ev_start:
             solapado = True
 
     # si hubo solapamiento, sugerir nuevas fechas

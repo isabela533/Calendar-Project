@@ -13,6 +13,12 @@ if "page" not in st.session_state:
 if "session" not in st.session_state: 
     st.session_state.session = None 
 
+if "resources" not in st.session_state: 
+    st.session_state["resources"] = [] 
+
+if "team" not in st.session_state: 
+    st.session_state["team"] = []
+
 
 # ---------- CSS ----------
 # ------ Login ------
@@ -73,7 +79,7 @@ div.stButton > button:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-    # ---------- Layout con columnas ----------
+# ---------- Layout con columnas ----------
 if st.session_state.page == "login":
     col1, col2 = st.columns([3,4])
 
@@ -124,6 +130,7 @@ if st.session_state.page == "login":
                 st.rerun()
         with col2: 
             if "next_page" in st.session_state: 
+                st.write("")
                 if st.button("Continue", key = "login_button"): 
                     st.session_state.page = st.session_state.next_page 
                     del st.session_state["next_page"]
@@ -161,6 +168,7 @@ elif st.session_state.page == "signup":
             st.session_state.session = session 
             st.session_state.next_page = "dashboard"
     if "next_page" in st.session_state: 
+        st.write("")
         if st.button("Continue", key = "signupbutton"): 
             st.session_state.page = st.session_state.next_page 
             del st.session_state["next_page"]
@@ -255,28 +263,46 @@ elif st.session_state.page == "dashboard":
 
     with col1:
         st.markdown("""
-        <h1 style="margin-bottom:0;">Agence Pro</h1>
-        <p class="subtitle">Smart time & resource management for marketing agencies</p>
+        <h1 style="margin-bottom:0;">Agence Pro 📸💡🪙</h1>
+        <p class="subtitle">Smart time & resource management for marketing agencies 📅</p>
         """, unsafe_allow_html=True)
 
     with col2:
-        if st.button("📦", key="inventory_btn"):
+        # CSS para que el botón sea solo el emoji, sin fondo
+        st.write("")
+        st.write("")
+        st.write("")
+        st.markdown("""
+        <style>
+        button[data-testid="stButton"] {
+            background-color: transparent !important;
+            color: black !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            font-size: 24px !important; /* tamaño del emoji */
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        if st.button("📦 Inventory", key="inventory_btn"):
             st.session_state.page = "inventory"   # aquí defines la página a la que quieres ir
             st.rerun()
 
     # ----- Money de la agencia -----
-    money = st.session_state.session.money 
+    money = st.session_state.session.data["money"] 
     st.markdown(f"<div class='money-box'>💰 Agency Budget: ${money:,.2f}</div>", unsafe_allow_html=True)
     # ---------- Buscador ----------
     search = st.text_input("🔍 Search events", "")
 
     events = st.session_state.session.data.get("events", [])
-    filtered = [ev for ev in events if search.lower() in ev["name"].lower()] 
-    if not filtered: 
-        st.info("No matching events.") 
-    else: 
-        for ev in filtered: 
-            st.write(f"{ev['name']} | {ev['init']} → {ev['end']} | Cost: {ev['cost']}")
+    if search:
+        filtered = [ev for ev in events if search.lower() in ev["name"].lower()] 
+        if not filtered: 
+            st.info("No matching events.") 
+        else: 
+            for ev in filtered: 
+                st.write(f"{ev['name']} | {ev['init']} → {ev['end']} | Cost: {ev['cost']}")
         
     # ---------- Lista de eventos y Eliminar Eventos ----------
     if not events:
@@ -286,13 +312,21 @@ elif st.session_state.page == "dashboard":
             if search.lower() in ev["name"].lower():
                 col1, col2 = st.columns([8,1]) 
                 # dos columnas: texto y botón 
-                with col1: 
-                    st.markdown(f""" 
-                                <div class="event-card"> 
-                                <b>{ev['name']}</b><br> 
-                                {ev['init']} → {ev['end']} | Cost: {ev['cost']} 
-                                </div> 
-                                """, unsafe_allow_html=True) 
+                with col1:
+                    # convertir recursos y team en texto legible
+                    resources_str = ", ".join([f"{r[0]} x{r[2]}" for r in ev.get("resources", [])])
+                    team_str = ", ".join([f"{t[0]} x{t[1]}" for t in ev.get("team", [])])
+
+                    st.markdown(f"""
+                        <div class="event-card" style="border:1px solid #ccc; padding:10px; border-radius:8px; margin-bottom:10px;">
+                            <b>{ev['name']}</b><br>
+                            💰 Cost: {ev['cost']}<br>
+                            📅 {ev['init']} → {ev['end']}<br>
+                            📦 Resources: {resources_str if resources_str else "None"}<br>
+                            👥 Team: {team_str if team_str else "None"}
+                        </div>
+                        """, unsafe_allow_html=True)
+ 
                 with col2: 
                     if st.button("🗑️", key=f"delete_{ev['name']}"): 
                         try: 
@@ -301,28 +335,65 @@ elif st.session_state.page == "dashboard":
                         except Exception as e: 
                             st.error(str(e))
 
-    # ---------- Botón flotante para agregar evento ----------
-    st.markdown('<div class="fab">+</div>', unsafe_allow_html=True)
 
     # Formulario para nuevo evento (expander)
     with st.expander("➕ Add new event"):
-        name = st.text_input("Event name")
-        init = st.date_input("Start date")
-        end = st.date_input("End date")
-        cost = st.number_input("Cost", min_value=0.0)
-        if st.button("Save event"):
-            new_event = {"name": name, "init": str(init), "end": str(end), "cost": cost}
-            try:
-                result = st.session_state.session.add_event(new_event)
-                #Caso 1 -> agregado correctamente 
-                if result is True:
-                    st.session_state["event_added"] = True
+        name = st.text_input("Event name", key="event_name")
+        init = st.date_input("Start date", key="event_init")
+        end = st.date_input("End date", key="event_end")
+        cost = st.number_input("Cost", min_value=0.0, key="event_cost")
+
+        # --- Recursos --- 
+        st.markdown("### 📦 Resources needed") 
+        with st.form("add_resources_form", clear_on_submit=True): 
+            res_name = st.text_input("Resource name") 
+            res_type = None 
+            res_cant = st.number_input("Quantity", min_value=1, step=1) 
+            res_submit = st.form_submit_button("Add resource") 
+            
+            if res_submit: 
+                st.session_state["resources"].append([res_name, res_type, res_cant, True]) 
+                st.success(f"Resource '{res_name}' added ✅") 
+                
+        # --- Team --- 
+        st.markdown("### 👥 Team needed") 
+        with st.form("add_team_form", clear_on_submit=True): 
+            rol = st.text_input("Role") 
+            emp_cant = st.number_input("Number of employees", min_value=1, step=1) 
+            team_submit = st.form_submit_button("Add team member") 
+
+            if team_submit: 
+                st.session_state["team"].append([rol, emp_cant, True]) 
+                st.success(f"Role '{rol}' added ✅")
+
+        col1, col2 = st.columns([1,1])
+        with col1:
+            if st.button("Save event"):
+                new_event = {"name": name, "init": str(init), "end": str(end), "cost": cost, "resources": st.session_state["resources"], "team": st.session_state["team"]}
+                try:
+                    result = st.session_state.session.add_event(new_event)
+                    #Caso 1 -> agregado correctamente 
+                    if result is True:
+                        st.session_state["event_added"] = True
+                        st.rerun()
+                    elif isinstance(result,tuple) and result[0] is False:
+                        st.session_state["event_suggestions"] = result[1]
+                        st.session_state["pending_event"] = new_event
+                except Exception as e:
+                    st.session_state["event_error"] = str(e) + " Please try again"
+                    st.session_state["resources"] = []
+                    st.session_state["team"] = [] 
                     st.rerun()
-                elif isinstance(result,tuple) and result[0] is False:
-                    st.session_state["event_suggestions"] = result[1]
-            except Exception as e:
-                st.session_state["event_error"] = str(e) 
+        with col2:
+            st.write("")
+            if st.button("Cancel"):
+                st.session_state["resources"] = []
+                st.session_state["team"] = []
+                st.session_state.page = "dashboard"
                 st.rerun()
+
+                
+
         # ----- Mostrar mensjaes persistentes ----- 
         if st.session_state.get("event_added", False): 
             st.success("Event added successfully.") 
@@ -332,13 +403,26 @@ elif st.session_state.page == "dashboard":
             suggestions = st.session_state["event_suggestions"]
             st.warning("⚠️ This date is already taken. Choose one of these available slots:")
             for i, (sug_init, sug_end) in enumerate(suggestions, start=1): 
-                if st.button(f"Option {i}: {sug_init} → {sug_end}"): 
-                    new_event["init"], new_event["end"] = sug_init, sug_end 
+                if st.button(f"Option {i}: {sug_init} → {sug_end}", key=f"suggestion_{i}"): 
+                    new_event = st.session_state.get("pending_event", {})
+                    if not new_event: 
+                        new_event = { 
+                            "name": st.session_state.get("event_name", ""), 
+                            "init": sug_init, 
+                            "end": sug_end, 
+                            "cost": st.session_state.get("event_cost", 0.0), 
+                            "resources": st.session_state.get("resources", []), 
+                            "team": st.session_state.get("team", []) 
+                            } 
+                    else: 
+                        new_event["init"], new_event["end"] = sug_init, sug_end
+
                     st.session_state.session.add_event(new_event) 
                     st.session_state["event_added"] = True 
                     st.session_state.pop("event_suggestions") 
+                    st.session_state.pop("pending_event")
                     st.rerun() 
-            if st.button("Cancel"): 
+            if st.button("Cancel", key = "cancel"): 
                 st.info("Event creation cancelled.") 
                 st.session_state.pop("event_suggestions") 
             
@@ -394,7 +478,7 @@ elif st.session_state.page == "inventory":
                         except Exception as e: 
                             st.error(str(e))
                 with col4: 
-                    if st.button("🗑️", key=f"del_{r['name']}"): 
+                    if st.button("🗑️", key=f"del_{name}"): 
                         try:
                             st.session_state.session.remove_resource([[name, type_, quantity, dispo]]) 
                             st.rerun()
@@ -468,7 +552,7 @@ elif st.session_state.page == "inventory":
                             st.error(str(e))
     
                 with col4: 
-                    if st.button("🗑️", key=f"del_{emp['rol']}"): 
+                    if st.button("🗑️", key=f"del_{rol}"): 
                         try:
                             st.session_state.session.remove_employee([[rol, quantity, dispo]]) 
                             st.rerun()

@@ -29,6 +29,9 @@ class Team_Manager:
         return work_team
     
     def liberar_employee(self, rol, cant ):
+        if not rol in self.work_team:
+            raise Exception(f"No {rol} team found")
+        
         # el empleado existe y está disponible 
         if self.is_available(rol): 
             self.work_team[rol].cant += cant # dispo ya es True, se mantiene así 

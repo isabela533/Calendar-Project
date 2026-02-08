@@ -1,0 +1,171 @@
+{
+    "money": 49430.0,
+    "resources": [
+        [
+            "Projector",
+            "Technology",
+            4,
+            true
+        ],
+        [
+            "Conference Room A",
+            "Space",
+            0,
+            false
+        ],
+        [
+            "Laptop",
+            "Technology",
+            8,
+            true
+        ],
+        [
+            "Whiteboard",
+            "Furniture",
+            2,
+            true
+        ],
+        [
+            "Microphone",
+            "Audio",
+            4,
+            true
+        ]
+    ],
+    "employees": [
+        [
+            "Coordinator",
+            2,
+            true
+        ],
+        [
+            "Technician",
+            3,
+            true
+        ],
+        [
+            "Speaker",
+            0,
+            false
+        ],
+        [
+            "Assistant",
+            1,
+            true
+        ]
+    ],
+    "co_requisites": {
+        "Projector": [
+            "Conference Room A",
+            "Laptop"
+        ],
+        "Microphone": [
+            "Conference Room A"
+        ]
+    },
+    "exclusions": [
+        [
+            "Conference Room A",
+            "Conference Room B"
+        ],
+        [
+            "Projector",
+            "Whiteboard"
+        ]
+    ],
+    "events": [
+        {
+            "name": "Campana de Brands -> Coca Cola",
+            "init": "2026-02-08",
+            "end": "2026-02-08",
+            "cost": 500.0,
+            "resources": [
+                [
+                    "Conference Room A",
+                    null,
+                    1,
+                    true
+                ]
+            ],
+            "team": [
+                [
+                    "Assistant",
+                    1,
+                    true
+                ]
+            ]
+        },
+        {
+            "name": "Venta de productos de L'Oreal",
+            "init": "2026-02-09",
+            "end": "2026-02-10",
+            "cost": 0.0,
+            "resources": [
+                [
+                    "Laptop",
+                    null,
+                    1,
+                    true
+                ],
+                [
+                    "Whiteboard",
+                    null,
+                    1,
+                    true
+                ]
+            ],
+            "team": [
+                [
+                    "Assistant",
+                    1,
+                    true
+                ],
+                [
+                    "Speaker",
+                    1,
+                    true
+                ]
+            ]
+        },
+        {
+            "name": "Lanzamiento de RHODE Lips 👄💄 ",
+            "init": "2026-02-13",
+            "end": "2026-02-15",
+            "cost": 20.0,
+            "resources": [
+                [
+                    "Laptop",
+                    null,
+                    1,
+                    true
+                ],
+                [
+                    "Whiteboard",
+                    null,
+                    1,
+                    true
+                ]
+            ],
+            "team": [
+                [
+                    "Assistant",
+                    1,
+                    true
+                ],
+                [
+                    "Speaker",
+                    1,
+                    true
+                ]
+            ]
+        },
+        {
+            "name": "NetWorking 👥💻",
+            "init": "2026-02-11",
+            "end": "2026-02-12",
+            "cost": 50.0,
+            "resources": [],
+            "team": []
+        }
+    ]
+}

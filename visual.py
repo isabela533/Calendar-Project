@@ -433,10 +433,15 @@ elif st.session_state.page == "dashboard":
 #----- Inventario ------
 elif st.session_state.page == "inventory":
     st.set_page_config(page_title="Inventory", layout="wide")
+    st.markdown(""" 
+                <style> 
+                .block-container { 
+                    padding-top: 80px; /* aumenta el espacio superior */ } 
+                </style> """, unsafe_allow_html=True)
     # ---------- Encabezado ---------- 
     st.markdown(""" 
                 <h1 style="margin-bottom:0;
-                ">Inventory</h1> 
+                ">Inventory 📋</h1> 
                 <p style="color:#777; font-size:16px; margin-top:0;"> 
                 Organize your resources and your working team.<br> 
                 You can also add restrictions on your resources for better care and management. 
@@ -453,7 +458,7 @@ elif st.session_state.page == "inventory":
         else: 
             for r in resources:
                 name, type_, quantity, dispo = r
-                col1, col2, col3, col4 = st.columns([6,1,1,1])
+                col1, col2, col3, col4 = st.columns([8,0.4,0.4,0.4])
                 with col1: 
                     st.markdown(f""" 
                                 <div style="padding:0.5rem; border:1px solid #ddd; border-radius:8px; background:#fafafa;"> 
@@ -466,55 +471,34 @@ elif st.session_state.page == "inventory":
                 with col2: 
                     if st.button("➕", key=f"inc_{name}"): 
                         try:
-                            st.session_state.session.add_resource([[name, type_, 1, dispo]]) 
+                            st.session_state.session.add_resources([[name, type_, 1, dispo]]) 
                             st.rerun() 
                         except Exception as e: 
                             st.error(str(e))         
                 with col3: 
                     if st.button("➖", key=f"dec_{name}"): 
                         try: 
-                            st.session_state.session.remove_resource([[name, type_, 1, dispo]]) 
+                            st.session_state.session.remove_resources([[name, type_, 1, dispo]]) 
                             st.rerun() 
                         except Exception as e: 
                             st.error(str(e))
                 with col4: 
                     if st.button("🗑️", key=f"del_{name}"): 
                         try:
-                            st.session_state.session.remove_resource([[name, type_, quantity, dispo]]) 
+                            st.session_state.session.remove_resources([[name, type_, quantity, dispo]]) 
                             st.rerun()
                         except Exception as e:
                             st.error(str(e))
                             
-        # Botones de agregar recursos
-        st.markdown(""" 
-                    <style> 
-                    .fab { 
-                    position: fixed; 
-                    bottom: 30px; 
-                    right: 30px; 
-                    background-color: #f76c4e; 
-                    color: white; 
-                    border-radius: 50%; 
-                    width: 60px; 
-                    height: 60px; 
-                    font-size: 30px; 
-                    text-align: center; 
-                    line-height: 60px; 
-                    cursor: pointer; 
-                    box-shadow: 0px 4px 6px rgba(0,0,0,0.2); 
-                    } 
-                    </style> 
-                    <div class="fab">+</div> """, unsafe_allow_html=True)
-                        
         with st.expander("➕ Add new resource"): 
             name = st.text_input("Resource name") 
             type_ = st.text_input("Type") 
-            quantity = st.number_input("Quantity", min_value=1, step=1) 
+            quantity = st.number_input("Quantity", min_value=1, step=1, key="team_quantity") 
             availability = True
             if st.button("Save resource"): 
                 new_resource = [[name, type_, quantity, availability]]
                 try: 
-                    st.session_state.session.add_resource(new_resource)  
+                    st.session_state.session.add_resources(new_resource)  
                     st.rerun() 
                 except Exception as e: 
                     st.error(str(e))  
@@ -525,9 +509,9 @@ elif st.session_state.page == "inventory":
         if not team: 
             st.info("No team members yet. Add your first one!") 
         else: 
-            for emp in team:
-                rol, quantity, dispo = e 
-                col1, col2, col3, col4 = st.columns([6,1,1,1])
+            for i, emp in enumerate(team):
+                rol, quantity, dispo = emp
+                col1, col2, col3, col4 = st.columns([8,0.4,0.4,0.4])
                 with col1:
                     st.markdown(f""" 
                                 <div style="padding:0.5rem; border:1px solid #ddd; border-radius:8px; background:#fafafa;"> 
@@ -537,14 +521,14 @@ elif st.session_state.page == "inventory":
                                 </div> 
                                 """, unsafe_allow_html=True)
                 with col2: 
-                    if st.button("➕", key=f"inc_{rol}"): 
+                    if st.button("➕", key=f"inc_{rol}_{i}"): 
                         try:
                             st.session_state.session.add_employee([[rol, 1, dispo]]) 
                             st.rerun() 
                         except Exception as e: 
                             st.error(str(e))         
                 with col3: 
-                    if st.button("➖", key=f"dec_{rol}"): 
+                    if st.button("➖", key=f"dec_{rol}_{i}"): 
                         try: 
                             st.session_state.session.remove_employee([[rol, 1, dispo]]) 
                             st.rerun() 
@@ -552,36 +536,17 @@ elif st.session_state.page == "inventory":
                             st.error(str(e))
     
                 with col4: 
-                    if st.button("🗑️", key=f"del_{rol}"): 
+                    if st.button("🗑️", key=f"del_{rol}_{i}"): 
                         try:
                             st.session_state.session.remove_employee([[rol, quantity, dispo]]) 
                             st.rerun()
                         except Exception as e:
                             st.error(str(e))
         #Botones de agregar empleados 
-        st.markdown(""" 
-                    <style> 
-                    .fab { 
-                    position: fixed; 
-                    bottom: 30px; 
-                    right: 30px; 
-                    background-color: #f76c4e; 
-                    color: white; 
-                    border-radius: 50%; 
-                    width: 60px; 
-                    height: 60px; 
-                    font-size: 30px; 
-                    text-align: center; 
-                    line-height: 60px; 
-                    cursor: pointer; 
-                    box-shadow: 0px 4px 6px rgba(0,0,0,0.2); 
-                    } 
-                    </style> 
-                    <div class="fab">+</div> """, unsafe_allow_html=True)
         
         with st.expander("➕ Add a new role"): 
             rol = st.text_input("Role name")  
-            cant = st.number_input("Quantity", min_value=1, step=1) 
+            cant = st.number_input("Quantity", min_value=1, step=1, key="employee_quantity") 
             dispo = True
             if st.button("Save new role"): 
                 new_resource = [[rol, cant, dispo]]
@@ -592,68 +557,67 @@ elif st.session_state.page == "inventory":
                     st.error(str(e))  
     # Restrictions
     with tabs[2]:
-       st.subheader("Restrictions list")
+        st.subheader("Restrictions list")
 
-       restrictions = st.session_state.session.data.get("restrictions", {})
+        co_requisites = st.session_state.session.data.get("co_requisites", {})
+        exclusions = st.session_state.session.data.get("exclusions", [])
 
-       co_requisites = restrictions.get("co_requisites", {})
-       exclusions = restrictions.get("exclusions", [])
+        if not co_requisites and not exclusions:
+            st.info("No restrictions defined.")
+        
+        st.markdown("### 🔗 Co‑requisites")
+        if co_requisites:
+            for resource, deps in co_requisites.items():
+                for dep in deps:
+                    col1, col2 = st.columns([8,0.5])
+                    with col1:
+                        st.write(f"- {resource} depends on {dep}")
+                    with col2:
+                        if st.button("🗑️", key=f"del_coreq_{resource}_{dep}"):
+                            try:
+                                st.session_state.session.remove_co_rq(resource, [dep])
+                                st.rerun()
+                            except Exception as e:
+                                st.error(str(e))
 
-       if not co_requisites and not exclusions:
-           st.info("No restrictions defined.")
-       else:
-            # Mostrar co-requisitos
-            if co_requisites:
-                st.markdown("### 🔗 Co‑requisites")
-                for resource, deps in co_requisites.items():
-                    for dep in deps:
-                        col1, col2 = st.columns([8,1])
-                        with col1:
-                            st.write(f"- {resource} depends on {dep}")
-                        with col2:
-                            if st.button("🗑️", key=f"del_coreq_{resource}_{dep}"):
-                                try:
-                                    st.session_state.session.delete_co_requisito(resource, [dep])
-                                    st.rerun()
-                                except Exception as e:
-                                    st.error(str(e))
-
-            with st.expander("➕ Add new co-requisite"):
-                resource = st.text_input("Name the resource or role that has dependency")
-                deps_text = st.text_input("Dependencies (comma separated)")
-                if st.button("Save co-requisite"):
-                    dependencia = [d.strip() for d in deps_text.split(",") if d.strip()]
-                    try:
-                        st.session_state.session.add_co_req(resource, dependencia)
-                        st.success("Co-requisite added successfully.")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(str(e))
+        with st.expander("➕ Add new co-requisite"):
+            resource = st.text_input("Name the resource or role that has dependency")
+            deps_text = st.text_input("Dependencies (comma separated)")
+            if st.button("Save co-requisite"):
+                dependencia = [d.strip() for d in deps_text.split(",") if d.strip()]
+                try:
+                    st.session_state.session.add_co_rq(resource, dependencia)
+                    st.success("Co-requisite added successfully.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(str(e))
                                         
-            # Mostrar exclusiones
-            if exclusions:
-                st.markdown("### 🚫 Exclusions")
-                for r1, r2 in exclusions:   # aquí cada elemento es una lista [r1, r2]
-                        col1,col2 = st.columns([8,1])
-                        with col1:
-                            st.write(f"- {r1} cannot be used with {r2}")
-                        with col2:
-                            if st.button("🗑️", key=f"del_excl_{r1}_{r2}"): 
-                                try: 
-                                    st.session_state.session.restrictions.delete_exclusion(r1, r2) 
-                                    st.rerun() 
-                                except Exception as e: 
-                                    st.error(str(e))
-            # Formulario para agregar nueva exclusión 
-            with st.expander("➕ Add new exclusion"): 
-                r1 = st.text_input("First resource") 
-                r2 = st.text_input("Second resource") 
-                if st.button("Save exclusion"): 
-                    try: # cada exclusión es una lista [r1, r2] 
-                        st.session_state.session.restrictions.add_exclusion(r1, r2) 
-                        st.success(f"Exclusion added: {r1} cannot be used with {r2}") 
-                        st.rerun() 
-                    except Exception as e: st.error(str(e))
+        # Mostrar exclusiones
+        if exclusions:
+            st.markdown("### 🚫 Exclusions")
+            for r1, r2 in exclusions:   # aquí cada elemento es una lista [r1, r2]
+                    col1,col2 = st.columns([8,0.5])
+                    with col1:
+                        st.write(f"- {r1} cannot be used with {r2}")
+                    with col2:
+                        if st.button("🗑️", key=f"del_excl_{r1}_{r2}"): 
+                            try: 
+                                st.session_state.session.remove_exclusion(r1, r2) 
+                                st.rerun() 
+                            except Exception as e: 
+                                st.error(str(e))
+
+        # Formulario para agregar nueva exclusión 
+        with st.expander("➕ Add new exclusion"): 
+            r1 = st.text_input("First resource") 
+            r2 = st.text_input("Second resource") 
+            if st.button("Save exclusion"): 
+                try: # cada exclusión es una lista [r1, r2] 
+                    st.session_state.session.add_exclusion(r1, r2) 
+                    st.success(f"Exclusion added: {r1} cannot be used with {r2}") 
+                    st.rerun() 
+                except Exception as e: st.error(str(e))
+
 
     # ---------- Botón inferior izquierdo para volver al dashboard ----------
     st.markdown("""

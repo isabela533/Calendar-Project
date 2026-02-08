@@ -78,6 +78,8 @@ class Team_Manager:
     def add_to_inventory(self, rol, cant = 1, dispo = True):
         if rol in self.work_team:   # se verifica si hay que aumentarle la cantidad o agregarle uno nuevo
             self.work_team[rol].cant += cant      # aumentamos la cantidad
+            if not self.work_team[rol].dispo:
+                self.work_team[rol].dispo = True
         else:
             self.work_team[rol] = Work_team(rol, cant, dispo)   # agregarle uno nuevo 
 

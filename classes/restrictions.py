@@ -26,7 +26,7 @@ class Restrictions:
         self.co_requisites[recurso] = list(current)
 
     def add_exclusion(self, r1, r2 ):
-        self.exclusions.append((r1, r2))       
+        self.exclusions.append([r1, r2])       
 
     def delete_co_requisito(self, recurso, dependencias ):
         if recurso in self.co_requisites:
@@ -40,10 +40,10 @@ class Restrictions:
         if not self.co_requisites[recurso]: del self.co_requisites[recurso]
         
     def delete_exclusion(self, r1, r2 ):
-        if (r1, r2) in self.exclusions: 
-            self.exclusions.remove((r1, r2))
-        elif (r2, r1) in self.exclusions:
-            self.exclusions.remove((r2, r1))    #por si esta en orden inverso
+        if [r1, r2] in self.exclusions: 
+            self.exclusions.remove([r1, r2])
+        elif [r2, r1] in self.exclusions:
+            self.exclusions.remove([r2, r1])    #por si esta en orden inverso
         else:
             raise Exception("This exclusion does not exist")
         

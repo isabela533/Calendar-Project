@@ -83,6 +83,8 @@ class Resources_Manager:
     def add_to_inventory(self, name : str, type, cant: int, dispo: bool = True):
         if name in self.recursos:   #si ya tiene el target, aumentarle la cant
             self.recursos[name].cant += cant
+            if not self.recursos[name].dispo:
+                self.recursos[name].dispo = True
         else:
             self.recursos[name] = Resources(name, type, cant, dispo) # agregar uno nuevo
 

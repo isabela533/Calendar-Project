@@ -8,12 +8,6 @@
             true
         ],
         [
-            "Conference Room A",
-            "Space",
-            0,
-            false
-        ],
-        [
             "Laptop",
             "Technology",
             8,
@@ -30,6 +24,12 @@
             "Audio",
             4,
             true
+        ],
+        [
+            "Conference Room A",
+            "Sale",
+            1,
+            true
         ]
     ],
     "employees": [
@@ -44,23 +44,30 @@
             true
         ],
         [
-            "Speaker",
-            0,
-            false
-        ],
-        [
             "Assistant",
             1,
+            true
+        ],
+        [
+            "Speaker",
+            1,
+            true
+        ],
+        [
+            "Camera Operator",
+            2,
             true
         ]
     ],
     "co_requisites": {
         "Projector": [
-            "Conference Room A",
-            "Laptop"
+            "Conference Room A"
         ],
         "Microphone": [
             "Conference Room A"
+        ],
+        "Camera": [
+            "Camera Operator"
         ]
     },
     "exclusions": [

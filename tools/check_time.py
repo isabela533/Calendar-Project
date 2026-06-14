@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json 
 
 #   ver validez de fechas (formato y validez)
@@ -22,6 +22,7 @@ def suggest_slot(init, end, ocuped_days: list):
 
     duration = end - init
     suggestions = []
+    hoy = date.today()
 
     for i in range(len(ocuped_days) - 1):
         current_end = ocuped_days[i][1]
@@ -31,14 +32,18 @@ def suggest_slot(init, end, ocuped_days: list):
         if gap >= duration.days:
             suggested_start = current_end + timedelta(days=1)
             suggested_end = suggested_start + duration
-            suggestion = (suggested_start.strftime("%Y-%m-%d"), suggested_end.strftime("%Y-%m-%d"))
-            if suggestion not in suggestions:
-                suggestions.append(suggestion)
+            if suggested_start >= hoy:
+                suggestion = (suggested_start.strftime("%Y-%m-%d"), suggested_end.strftime("%Y-%m-%d"))
+                if suggestion not in suggestions:
+                    suggestions.append(suggestion)
 
     # sugerir después del último evento
     last_end = ocuped_days[-1][1]
     finish_start = last_end + timedelta(days=1)
     finish_end = finish_start + duration
+    if finish_start < hoy:
+        finish_start = hoy
+        finish_end   = hoy + duration
     suggestion = (finish_start.strftime("%Y-%m-%d"), finish_end.strftime("%Y-%m-%d"))
     if suggestion not in suggestions:
         suggestions.append(suggestion)

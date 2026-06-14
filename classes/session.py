@@ -46,17 +46,19 @@ class Session:
     # region -> Manejo de eventos
     def add_event(self, event : dict):
         if event in self.data["events"]:
-            raise Exception(" Ummm 🤔 This event is already registered in the system.")
+            raise Exception("Ummm 🤔 This event is already registered in the system.")
+        
         result = gestor_add_event(event, self)
+        
         if result["success"]:
             self.data["money"] -= event["cost"]
             self.data["events"].append(event)
             self.refresh_data()
             return True
         elif "suggestions" in result:
-            return False, result["suggestions"]   
-        elif "error" in result: 
-            raise Exception(result["error"]) 
+            return False, result["suggestions"]
+        elif "error" in result:
+            raise Exception(result["error"])
 
     def show_events(self): 
         events = self.data.get("events", []) 

@@ -14,19 +14,39 @@ def add_event(new_event: dict, session : "Session"):
     if valid is not True:
         return {"success": False, "error": valid}
 
-    result = is_available(init, end, session.data)
-    if not result["available"]:
-        return {"success": False, "suggestions": result["suggestions"]}
+    rsc_names = [session.rc_mg.recursos[name].name 
+                 for name, type_, cant, dispo in new_event.get("resources", [])
+                 if name in session.rc_mg.recursos]
+    emp_names = [session.emp_mg.work_team[rol].rol 
+                 for rol, cant, dispo in new_event.get("team", [])
+                 if rol in session.emp_mg.work_team]
 
-    # validar recursos y empleados
-    rsc = session.get_rcs(new_event["resources"])
-    emp = session.get_emp(new_event["team"])
-    session.restrictions.validate(rsc + emp)
+    try:
+        session.restrictions.validate(rsc_names + emp_names)
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
-    # si todo está bien, agregar
+    ocupados_rc  = []  # track de recursos ocupados exitosamente
+    ocupados_emp = []  # track de empleados ocupados exitosamente
+
+    try:
+        for name, type_, cant, dispo in new_event.get("resources", []):
+            session.ocupar_resource(name, cant)
+            ocupados_rc.append((name, cant))  # solo agrega si no lanzó excepción
+
+        for rol, cant, dispo in new_event.get("team", []):
+            session.ocupar_employee(rol, cant)
+            ocupados_emp.append((rol, cant))  # solo agrega si no lanzó excepción
+
+    except Exception as e:
+        # Falló al ocupar — revertir SOLO los que sí se ocuparon
+        for name, cant in ocupados_rc:
+            session.liberar_resource(name, cant)
+        for rol, cant in ocupados_emp:
+            session.liberar_employee(rol, cant)
+        return {"success": False, "error": str(e)}
+
     return {"success": True}
-
-        
 
 
 

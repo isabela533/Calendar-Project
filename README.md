@@ -30,6 +30,8 @@ streamlit run visual.py
 
 Streamlit abrirá automáticamente una pestaña en tu navegador (normalmente en `http://localhost:8501`). Desde ahí puedes crear una cuenta nueva o iniciar sesión con una existente.
 
+> 💡 **¿Quieres probarlo rápido sin crear una cuenta?** Inicia sesión con `isabela.alvarez.ramos@gmail.com` — ya tiene presupuesto, inventario, equipo y eventos cargados de ejemplo, lista para explorar todas las funcionalidades sin pasos previos.
+
 ---
 
 ## 🧠 Cómo está pensado por dentro

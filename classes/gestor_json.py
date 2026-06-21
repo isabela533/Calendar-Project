@@ -1,9 +1,11 @@
 import json 
 import os
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # sube desde classes/ a la raíz
+DATA_DIR = os.path.join(ROOT_DIR, "data")
 
-class Gestor_json: 
+class Gestor_json:
     def __init__(self, correo):
-        self.ruta = f"data/{correo}.json" 
+        self.ruta = os.path.join(DATA_DIR, f"{correo}.json") 
         self.data = {}
 
     def charge_data(self):

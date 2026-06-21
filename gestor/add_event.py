@@ -14,6 +14,10 @@ def add_event(new_event: dict, session : "Session"):
     if valid is not True:
         return {"success": False, "error": valid}
 
+    availability = is_available(init, end, session.data)
+    if not availability["available"]:
+        return {"success": False, "suggestions": availability["suggestions"]}
+    
     rsc_names = [session.rc_mg.recursos[name].name 
                  for name, type_, cant, dispo in new_event.get("resources", [])
                  if name in session.rc_mg.recursos]

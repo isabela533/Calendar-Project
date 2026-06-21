@@ -1,13 +1,17 @@
-import streamlit as st
+import sys
 import os
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+import streamlit as st
 from classes.session import Session
-import dashboard as dashboard
-import login as login
-import ideas as ideas
-import signup as signup
-import inventory as inventory
-import calendario as calendario
-import reportes as reportes 
+from dashboard import show_dashboard
+from login import show_login
+from ideas import show_ideas
+from signup import show_signup 
+from inventory import show_inventory
+from calendario import show_calendario
+from reportes import show_reportes
     
 st.set_page_config(page_title="AgencePro", page_icon="📅", layout="wide")
 
@@ -86,26 +90,26 @@ div.stButton > button:first-child {
 
 # ---------- Layout con columnas ----------
 if st.session_state.page == "login":
-    login.show_login()
+    show_login()
 
 # ---- Sign up -----            
 elif st.session_state.page == "signup": 
-    signup.show_signup()
+    show_signup()
 
 #---- Dashboard ----
 elif st.session_state.page == "dashboard":            
-    dashboard.show_dashboard()
+    show_dashboard()
 
 #----- Inventario ------
 elif st.session_state.page == "inventory":
-    inventory.show_inventory()
+    show_inventory()
 
 #----- Ideas ------
 elif st.session_state.page == "ideas":
-    ideas.show_ideas()
+    show_ideas()
 
 elif st.session_state.page == "calendario":
-    calendario.show_calendario()
+    show_calendario()
 
 elif st.session_state.page == "reportes":
-    reportes.show_reportes()
+    show_reportes()

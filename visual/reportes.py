@@ -84,6 +84,7 @@ def show_reportes():
     events     = data.get("events", [])
 
     # ── Sidebar ───────────────────────────────────────────────────────────
+    role = getattr(st.session_state.session, "role", "admin")
     with st.sidebar:
         st.markdown("&nbsp;", unsafe_allow_html=True)
         st.markdown('<div class="sb-brand">AgencePro<span>.</span></div>', unsafe_allow_html=True)
@@ -91,24 +92,27 @@ def show_reportes():
         st.markdown('<div class="sb-nav-label">Menú</div>', unsafe_allow_html=True)
 
         if st.button("🗓️  Eventos", key="btn_nav_eventos"):
-            st.session_state.page = "dashboard"
-            st.rerun()
+          st.session_state.page = "dashboard"
+          st.rerun()
 
         if st.button("📆  Calendario", key="btn_nav_calendario"):
-            st.session_state.page = "calendario"
-            st.rerun()
+          st.session_state.page = "calendario"
+          st.rerun()
 
-        if st.button("📦  Inventario", key="btn_nav_inventory"):
-            st.session_state.page = "inventory"
-            st.rerun()
 
         if st.button("💡  Ideas", key="btn_nav_ideas"):
-            st.session_state.page = "ideas"
-            st.rerun()
+          st.session_state.page = "ideas"
+          st.rerun()
 
-        if st.button("📊  Reportes", key="btn_nav_reportes"):
+        if role == "admin":
+          if st.button("📦  Inventario", key="btn_nav_inventory"):
+            st.session_state.page = "inventory"
+            st.rerun()   
+          
+          if st.button("📊  Reportes", key="btn_nav_reportes"):
             st.session_state.page = "reportes"
             st.rerun()
+
 
         st.markdown(f"""
         <div class="sb-user">

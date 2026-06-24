@@ -123,12 +123,21 @@ def show_inventory():
                 st.rerun()
 
     # ── Tabs ──────────────────────────────────────────────────────────────
-    tabs = st.tabs(["📦 Recursos", "👥 Equipo", "⚖️ Restricciones"])
+    role = getattr(st.session_state.session, "role", "admin")
+
+    if role == "admin":
+        tab_recursos, tab_equipo, tab_restricciones, tab_acceso = st.tabs(
+            ["📦 Recursos", "👥 Equipo", "⚖️ Restricciones", "🔑 Acceso"]
+        )
+    else:
+        tab_recursos, tab_equipo, tab_restricciones = st.tabs(
+            ["📦 Recursos", "👥 Equipo", "⚖️ Restricciones"]
+        )
 
     # ════════════════════════════════════════════════════════
     # TAB 1 — RECURSOS
     # ════════════════════════════════════════════════════════
-    with tabs[0]:
+    with tab_recursos:
         resources = st.session_state.session.data.get("resources", [])
         if not resources:
             st.info("No hay recursos aún. ¡Agrega el primero!")
@@ -190,7 +199,7 @@ def show_inventory():
     # ════════════════════════════════════════════════════════
     # TAB 2 — EQUIPO
     # ════════════════════════════════════════════════════════
-    with tabs[1]:
+    with tab_equipo:
         team = st.session_state.session.data.get("employees", [])
         if not team:
             st.info("No hay miembros de equipo aún. ¡Agrega el primero!")
@@ -251,7 +260,7 @@ def show_inventory():
     # ════════════════════════════════════════════════════════
     # TAB 3 — RESTRICCIONES
     # ════════════════════════════════════════════════════════
-    with tabs[2]:
+    with tab_restricciones:
         co_requisites = st.session_state.session.data.get("co_requisites", {})
         exclusions    = st.session_state.session.data.get("exclusions", [])
 
@@ -321,3 +330,48 @@ def show_inventory():
                     st.rerun()
                 except Exception as e:
                     st.error(str(e))
+
+    # ════════════════════════════════════════════════════════
+    # TAB 4 — ACCESO (solo admin)
+    # ════════════════════════════════════════════════════════
+    if role == "admin":
+        with tab_acceso:
+            st.markdown('<div class="section-title">Operadores con acceso</div>', unsafe_allow_html=True)
+
+            operadores = st.session_state.session.get_operators()
+
+            if not operadores:
+                st.info("No has agregado operadores aún. Solo tú tienes acceso a esta agencia.")
+            else:
+                for i, op in enumerate(operadores):
+                    col_card, col_del = st.columns([10, 0.5])
+                    with col_card:
+                        st.markdown(f"""
+                        <div class="restr-card">
+                          <i class="ti ti-user-circle" style="color:#D85A30;font-size:16px;flex-shrink:0;"></i>
+                          <span><b>{op['correo']}</b> — {op['rol']}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with col_del:
+                        st.write("")
+                        if st.button("🗑️", key=f"del_operator_{i}"):
+                            try:
+                                st.session_state.session.remove_operator(op["correo"])
+                                st.rerun()
+                            except Exception as e:
+                                st.error(str(e))
+
+            with st.expander("＋  Agregar operador"):
+                nuevo_correo = st.text_input("Correo del operador", key="new_operator_correo")
+                if st.button("Dar acceso", key="save_operator"):
+                    if nuevo_correo:
+                        try:
+                            correo_limpio = nuevo_correo.strip().lower()
+                            st.session_state.session.add_operator(correo_limpio)
+                            st.success(f"Acceso otorgado a {correo_limpio}.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(str(e))
+                    else:
+                        st.warning("Por favor ingresa un correo.")
+        

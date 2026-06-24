@@ -120,6 +120,7 @@ def show_calendario():
     dot_colors = ["#D85A30", "#7F77DD", "#1D9E75", "#D4537E", "#378ADD", "#BA7517"]
 
     # ── Sidebar ───────────────────────────────────────────────────────────
+    role = getattr(st.session_state.session, "role", "admin")
     with st.sidebar:
         st.markdown("&nbsp;", unsafe_allow_html=True)
         st.markdown('<div class="sb-brand">AgencePro<span>.</span></div>', unsafe_allow_html=True)
@@ -134,17 +135,18 @@ def show_calendario():
             st.session_state.page = "calendario"
             st.rerun()
 
-        if st.button("📦  Inventario", key="btn_nav_inventory"):
-            st.session_state.page = "inventory"
-            st.rerun()
-
         if st.button("💡  Ideas", key="btn_nav_ideas"):
             st.session_state.page = "ideas"
             st.rerun()
 
-        if st.button("📊  Reportes", key="btn_nav_reportes"):
-            st.session_state.page = "reportes"
-            st.rerun()
+        if role == "admin":
+            if st.button("📦  Inventario", key="btn_nav_inventory"):
+                st.session_state.page = "inventory"
+                st.rerun()
+
+            if st.button("📊  Reportes", key="btn_nav_reportes"):
+                st.session_state.page = "reportes"
+                st.rerun()
 
         st.markdown(f"""
         <div class="sb-user">

@@ -5,9 +5,12 @@ from classes.restrictions import Restrictions
 from gestor.add_event import add_event as gestor_add_event
 from gestor.delete_event import delete_event as gestor_del_event
 class Session:
-    def __init__(self, correo, money = None, resources = None, employees = None, co_requisites = None, exclusions = None, create = False):
+    def __init__(self, correo, money = None, resources = None, employees = None, co_requisites = None, exclusions = None, role = "admin", owner_correo = None, team_access = None, create = False, filepath = None):
         self.correo = correo
-        self.json = Gestor_json(correo)
+        self.json = Gestor_json(owner_correo or correo)
+        self.role = role
+        self.owner_correo = owner_correo or correo
+        
         
         if create: # crear cuenta nueva 
             self.money = money or 0 
@@ -15,6 +18,7 @@ class Session:
             employees = employees or [] 
             co_requisites = co_requisites or {} 
             exclusions = exclusions or [] 
+            team_access = team_access or []
             self.json.save_initial_data(self.money, resources, employees, co_requisites, exclusions)
 
         else: # abrir sesión existente 
@@ -24,6 +28,7 @@ class Session:
             employees = data["employees"] 
             co_requisites = data["co_requisites"] 
             exclusions = data["exclusions"]
+            team_access = data["team_access"]
 
         #inventario en memoria y en json 
         self.rc_mg = Resources_Manager()
@@ -42,6 +47,28 @@ class Session:
     
     def refresh_data(self):
         self.json.save_data(self.data)
+
+    # region -> Manejo de operadores 
+    def add_operator(self, correo_operador):
+        if self.role != "admin":
+            raise Exception("Solo el administrador puede agregar operadores.")
+        team_access = self.data.get("team_access", [])
+        if any(op["correo"] == correo_operador for op in team_access):
+            raise Exception("Este correo ya tiene acceso como operador.")
+        team_access.append({"correo": correo_operador, "rol": "operador"})
+        self.data["team_access"] = team_access
+        self.refresh_data()
+
+    def remove_operator(self, correo_operador):
+        if self.role != "admin":
+            raise Exception("Solo el administrador puede quitar operadores.")
+        team_access = self.data.get("team_access", [])
+        self.data["team_access"] = [op for op in team_access if op["correo"] != correo_operador]
+        self.refresh_data()
+
+    def get_operators(self):
+        return self.data.get("team_access", [])
+    #endregion
 
     # region -> Manejo de eventos
     def add_event(self, event : dict):

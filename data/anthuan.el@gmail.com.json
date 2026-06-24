@@ -1,11 +1,9 @@
 {
-    "money": 50000,
+    "money": 7,
     "resources": [],
     "employees": [],
     "co_requisites": {},
     "exclusions": [],
     "events": [],
-    "team_access": [
-        {"correo": "usuario@ejemplo.com", "rol": "operador"}
-    ]
+    "team_access": []
 }

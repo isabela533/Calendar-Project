@@ -23,7 +23,8 @@ class Gestor_json:
                 "employees": employees, 
                 "co_requisites": co_requisites, 
                 "exclusions": exclusions, 
-                "events": [] 
+                "events": [],
+                "team_access": []
             } 
         self.save_data(data) 
         return data

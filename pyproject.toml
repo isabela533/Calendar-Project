@@ -1,0 +1,6 @@
+[project]
+name = "Calendar-Project"
+version = "0.1.0"
+description = "AgencePro - Gestión integral para agencias de marketing"
+authors = [{name="Isabela Álvarez Ramos"}]
+dependencies = ["streamlit"]

@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import date
-from fechas_clave import get_fechas_clave, get_proximas, TIPO_COLORES
+from .fechas_clave import get_fechas_clave, get_proximas, TIPO_COLORES
 from datetime import date as date_type
 
 def show_ideas():

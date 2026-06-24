@@ -5,13 +5,13 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 import streamlit as st
 from classes.session import Session
-from dashboard import show_dashboard
-from login import show_login
-from ideas import show_ideas
-from signup import show_signup 
-from inventory import show_inventory
-from calendario import show_calendario
-from reportes import show_reportes
+from .dashboard import show_dashboard
+from .login import show_login
+from .ideas import show_ideas
+from .signup import show_signup 
+from .inventory import show_inventory
+from .calendario import show_calendario
+from .reportes import show_reportes
     
 st.set_page_config(page_title="AgencePro", page_icon="📅", layout="wide")
 

@@ -1,6 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from logic_buttons import handle_login
+from .logic_buttons import handle_login
 
 def show_login():
     params = st.query_params

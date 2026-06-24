@@ -1,6 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from logic_buttons import handle_signup
+from .logic_buttons import handle_signup
 
 def show_signup():
     warning_msg = st.session_state.pop("signup_warning", "")

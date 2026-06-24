@@ -130,26 +130,26 @@ def show_signup():
 
         if st.button("Crear cuenta →", key="btn_signup"):
             if not correo or presupuesto <= 0:
-                st.session_state.signup_warning = "Por favor completa todos los campos."
-                st.rerun()
+              st.session_state.signup_warning = "Por favor completa todos los campos."
+              st.rerun()
             else:
-                session, mensaje = handle_signup(correo, presupuesto)
-                if session and "already exists" in mensaje:
-                    # Cuenta existente — muestra aviso y no navega
-                    st.session_state.signup_warning = mensaje
-                    st.rerun()
-                elif session:
-                    # Cuenta nueva creada OK
-                    st.session_state.session = session
-                    st.session_state.correo  = correo
-                    st.session_state.page    = "dashboard"
-                    st.rerun()
-                if warning_msg:
-                    st.markdown(f'<div class="form-warning">{warning_msg}</div>', unsafe_allow_html=True)
-                    if "already exists" in warning_msg:
-                        if st.button("← Iniciar sesión con esta cuenta", key="btn_goto_login"):
-                            st.session_state.page = "login"
-                            st.rerun()
+              session, mensaje = handle_signup(correo, presupuesto)
+              if session and "already exists" in mensaje:
+                  # Cuenta existente — muestra aviso y no navega
+                  st.session_state.signup_warning = mensaje
+                  st.rerun()
+              elif session:
+                  # Cuenta nueva creada OK
+                  st.session_state.session = session
+                  st.session_state.correo  = correo
+                  st.session_state.page    = "dashboard"
+                  st.rerun()
+              if warning_msg:
+                  st.markdown(f'<div class="form-warning">{warning_msg}</div>', unsafe_allow_html=True)
+                  if "already exists" in warning_msg:
+                      if st.button("← Iniciar sesión con esta cuenta", key="btn_goto_login"):
+                          st.session_state.page = "login"
+                          st.rerun()
 
         st.markdown("""
         <div class="divider-wrap">

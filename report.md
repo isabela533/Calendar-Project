@@ -113,7 +113,7 @@ Un detalle que terminó siendo clave: al crear un evento, el sistema **primero v
 ---
 
 ### 📦 Inventario
-- Organizado en tres pestañas: **Recursos**, **Equipo** y **Restricciones**.  
+- Organizado en tres pestañas: **Recursos**, **Equipo**, **Restricciones** (y **Acceso** si el usuario es administrador).  
 - Ejemplo: agregar un recurso y definir una restricción:  
   1. En Recursos: agrega "Proyector", tipo "Tecnología", cantidad 3.  
   2. En Restricciones: define que "Proyector" depende de "Sala de Conferencias".  

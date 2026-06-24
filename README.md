@@ -24,11 +24,16 @@ AgencePro nace de un problema muy concreto: una agencia que maneja varios evento
 # 1. Instala las dependencias
 pip install streamlit
 
-# 2. Desde la carpeta raíz del proyecto, ejecuta
+# 2. Ubícate en la carpeta visual/ (ahí vive el punto de entrada de la app)
+cd visual
+
+# 3. Ejecuta
 streamlit run visual.py
 ```
 
 Streamlit abrirá automáticamente una pestaña en tu navegador (normalmente en `http://localhost:8501`). Desde ahí puedes crear una cuenta nueva o iniciar sesión con una existente.
+
+> 💡 **¿Quieres probarlo rápido sin crear una cuenta?** Inicia sesión con `isabela.alvarez.ramos@gmail.com` — ya tiene presupuesto, inventario, equipo y eventos cargados de ejemplo, lista para explorar todas las funcionalidades sin pasos previos.
 
 ---
 
